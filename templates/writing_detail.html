@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Orqaga qaytish va Sarlavha -->
+    <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+        <a href="/writing" class="text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition">&larr; Writing mavzulariga qaytish</a>
+        <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Writing Task - Mavzu #{{ topic.id }}</span>
+    </div>
+
+    <!-- Mavzu va Ko'rsatma bloki -->
+    <div class="bg-gray-900/80 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-3">
+        <h1 class="text-2xl font-black text-white">{{ topic.title }}</h1>
+        <div class="p-4 bg-slate-950 rounded-xl border border-gray-800 text-gray-300 text-sm leading-relaxed">
+            <strong class="text-emerald-400 block mb-1">Topshiriq / Ko'rsatma:</strong>
+            {{ topic.prompt_text }}
+        </div>
+
+        <!-- AI Yordamchi tugmasi -->
+        <div class="pt-2">
+            <button onclick="getAiHelp()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center space-x-2">
+                <span>💡 AI Yordamchi (Reja va Kalit so'zlar so'rash)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Yordamchi Natijasi -->
+    <div id="ai-help-box" class="hidden bg-gray-900/90 border border-blue-500/30 p-6 rounded-2xl shadow-xl space-y-3">
+        <h3 class="text-lg font-bold text-blue-400">🤖 AI Ekspert Maslahatlari:</h3>
+        <div id="ai-help-content" class="text-gray-300 text-sm whitespace-pre-line leading-relaxed bg-slate-950 p-4 rounded-xl border border-gray-800"></div>
+    </div>
+
+    <!-- Esse yozish maydoni -->
+    <div class="bg-gray-900/80 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-4">
+        <label class="block text-sm font-bold text-gray-200">Esseingizni yozing:</label>
+        <textarea id="essay-text" rows="10" oninput="updateWordCount()" placeholder="Write your essay here..." class="w-full bg-slate-950 border border-gray-800 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-emerald-500 transition leading-relaxed"></textarea>
+
+        <div class="flex justify-between items-center pt-2">
+            <span id="word-count" class="text-xs font-semibold text-gray-400">So'zlar soni: 0</span>
+            <button onclick="checkWriting()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+                Tahlil qilish
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Tahlil / Natija qismi -->
+    <div id="feedback-box" class="hidden bg-gray-900/90 border border-emerald-500/30 p-6 rounded-2xl shadow-2xl space-y-4">
+        <h3 class="text-lg font-black text-emerald-400">🤖 AI Ekspert Tahlili va Bahosi:</h3>
+        <div id="feedback-content" class="text-gray-300 text-sm whitespace-pre-line leading-relaxed bg-slate-950 p-5 rounded-xl border border-gray-800"></div>
+    </div>
+</div>
+
+<script>
+function updateWordCount() {
+    const text = document.getElementById('essay-text').value.trim();
+    const words = text === "" ? 0 : text.split(/\s+/).length;
+    document.getElementById('word-count').innerText = "So'zlar soni: " + words;
+}
+
+async function getAiHelp() {
+    const helpBox = document.getElementById('ai-help-box');
+    const helpContent = document.getElementById('ai-help-content');
+
+    helpBox.classList.remove('hidden');
+    helpContent.innerText = "AI siz uchun mavzu bo'yicha reja va foydali so'zlarni tayyorlamoqda...";
+
+    try {
+        const response = await fetch('/api/ai-helper', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text_content: "{{ topic.title }} - {{ topic.prompt_text }}",
+                module_type: "Writing"
+            })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+            helpContent.innerText = data.ai_help;
+        } else {
+            helpContent.innerText = "Xatolik yuz berdi.";
+        }
+    } catch (err) {
+        helpContent.innerText = "Server bilan aloqa yo'q.";
+    }
+}
+
+async function checkWriting() {
+    const essayText = document.getElementById('essay-text').value.trim();
+    const feedbackBox = document.getElementById('feedback-box');
+    const feedbackContent = document.getElementById('feedback-content');
+
+    if (!essayText) {
+        alert("Iltimos, avval essengizni yozing!");
+        return;
+    }
+
+    feedbackBox.classList.remove('hidden');
+    feedbackContent.innerText = "AI esseingizni tahlil qilmoqda, iltimos kuting...";
+
+    try {
+        const response = await fetch('/check-writing', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ essay_text: essayText })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+            feedbackContent.innerText = data.feedback;
+        } else {
+            feedbackContent.innerText = "Xatolik yuz berdi.";
+        }
+    } catch (err) {
+        feedbackContent.innerText = "Server bilan aloqa yo'q.";
+    }
+}
+</script>
+{% endblock %}

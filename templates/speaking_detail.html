@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Orqaga qaytish -->
+    <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+        <a href="/speaking" class="text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition">&larr; Speaking mavzulariga qaytish</a>
+        <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Speaking Task #{{ topic.id }}</span>
+    </div>
+
+    <!-- Mavzu bloki -->
+    <div class="bg-gray-900/80 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-3">
+        <h1 class="text-2xl font-black text-white">{{ topic.title }}</h1>
+        <p class="text-sm text-gray-400">Ushbu mavzu bo'yicha o'z fikringizni bayon qiling. Mikrofonni yoqib gapirishingiz yoki matnni o'zingiz kiritishingiz mumkin.</p>
+
+        <!-- AI Yordamchi tugmasi -->
+        <div class="pt-2">
+            <button onclick="getAiHelp()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center space-x-2">
+                <span>💡 AI Yordamchi (G'oya va Kalit so'zlar)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Yordamchi Natijasi -->
+    <div id="ai-help-box" class="hidden bg-gray-900/90 border border-blue-500/30 p-6 rounded-2xl shadow-xl space-y-3">
+        <h3 class="text-lg font-bold text-blue-400">🤖 AI Ekspert Maslahatlari:</h3>
+        <div id="ai-help-content" class="text-gray-300 text-sm whitespace-pre-line leading-relaxed bg-slate-950 p-4 rounded-xl border border-gray-800"></div>
+    </div>
+
+    <!-- Nutq matnini kiritish va Mikrofon -->
+    <div class="bg-gray-900/80 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-4">
+        <div class="flex justify-between items-center">
+            <label class="block text-sm font-bold text-gray-200">Aytgan nutqingiz matni (Transkript):</label>
+
+            <!-- Mikrofon tugmasi -->
+            <button id="mic-btn" onclick="toggleSpeechRecognition()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2">
+                <span id="mic-icon">🎤</span>
+                <span id="mic-text">Mikrofonni yoqish</span>
+            </button>
+        </div>
+
+        <textarea id="transcript-text" rows="6" placeholder="Type or use microphone to speak..." class="w-full bg-slate-950 border border-gray-800 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-emerald-500 transition leading-relaxed"></textarea>
+
+        <div class="flex justify-end pt-2">
+            <button onclick="checkSpeaking()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+                Nutqni tahlil qilish
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Tahlil / Natija qismi -->
+    <div id="feedback-box" class="hidden bg-gray-900/90 border border-emerald-500/30 p-6 rounded-2xl shadow-2xl space-y-4">
+        <h3 class="text-lg font-black text-emerald-400">🤖 AI Speaking Tahlili va Bahosi:</h3>
+        <div id="feedback-content" class="text-gray-300 text-sm whitespace-pre-line leading-relaxed bg-slate-950 p-5 rounded-xl border border-gray-800"></div>
+    </div>
+</div>
+
+<script>
+let recognition = null;
+let isRecording = false;
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; // Ingliz tilida gaplashish uchun
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = function(event) {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        document.getElementById('transcript-text').value = transcript;
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Speech recognition error", event.error);
+        stopRecording();
+    };
+
+    recognition.onend = function() {
+        stopRecording();
+    };
+}
+
+function toggleSpeechRecognition() {
+    if (!recognition) {
+        alert("Sizning brauzeringiz ovozni matnga o'tkazishni qo'llab-quvvatlamaydi. Iltimos Chrome yoki Edge ishlating.");
+        return;
+    }
+
+    if (isRecording) {
+        recognition.stop();
+    } else {
+        recognition.start();
+        isRecording = true;
+        document.getElementById('mic-btn').className = "bg-red-500 text-white border border-red-600 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2 animate-pulse";
+        document.getElementById('mic-text').innerText = "Tinglanmoqda...";
+    }
+}
+
+function stopRecording() {
+    isRecording = false;
+    if (recognition) {
+        try { recognition.stop(); } catch(e){}
+    }
+    const micBtn = document.getElementById('mic-btn');
+    if(micBtn) {
+        micBtn.className = "bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2";
+        document.getElementById('mic-text').innerText = "Mikrofonni yoqish";
+    }
+}
+
+async function getAiHelp() {
+    const helpBox = document.getElementById('ai-help-box');
+    const helpContent = document.getElementById('ai-help-content');
+
+    helpBox.classList.remove('hidden');
+    helpContent.innerText = "AI mavzu bo'yicha so'zlar va reja tayyorlamoqda...";
+
+    try {
+        const response = await fetch('/api/ai-helper', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text_content: "{{ topic.title }}",
+                module_type: "Speaking"
+            })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            helpContent.innerText = data.ai_help;
+        } else {
+            helpContent.innerText = "Xatolik yuz berdi.";
+        }
+    } catch (err) {
+        helpContent.innerText = "Server bilan aloqa yo'q.";
+    }
+}
+
+async function checkSpeaking() {
+    stopRecording();
+    const transcriptText = document.getElementById('transcript-text').value.trim();
+    const feedbackBox = document.getElementById('feedback-box');
+    const feedbackContent = document.getElementById('feedback-content');
+
+    if (!transcriptText) {
+        alert("Iltimos, nutq matnini kiriting yoki mikrofon orqali gapiring!");
+        return;
+    }
+
+    feedbackBox.classList.remove('hidden');
+    feedbackContent.innerText = "AI nutqingizni tahlil qilmoqda...";
+
+    try {
+        const response = await fetch('/check-speaking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript: transcriptText })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            feedbackContent.innerText = data.feedback;
+        } else {
+            feedbackContent.innerText = "Xatolik yuz berdi.";
+        }
+    } catch (err) {
+        feedbackContent.innerText = "Server bilan aloqa yo'q.";
+    }
+}
+</script>
+{% endblock %}

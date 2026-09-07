@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-8 max-w-5xl mx-auto">
+    <div class="border-b border-gray-800 pb-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-3xl font-black text-white">Admin Panel</h2>
+            <p class="text-gray-400 mt-2">Sun'iy intellekt yordamida CEFR platformasiga kontent qo'shish.</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="/admin/users" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition">Foydalanuvchilar</a>
+            <a href="/reading" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition">Reading</a>
+            <a href="/listening" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition">Listening</a>
+            <a href="/writing" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition">Writing</a>
+            <a href="/speaking" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition">Speaking</a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- 1. Reading qo'shish (AI orqali) -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
+            <h3 class="text-xl font-bold text-white mb-4">Reading Matni (AI orqali)</h3>
+            <form action="/admin/add-reading-ai" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Sarlavha (Title)</label>
+                    <input type="text" name="title" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Passage Text</label>
+                    <textarea name="passage_text" rows="4" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
+                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="A2">A2</option>
+                        <option value="B1">B1</option>
+                        <option value="B2" selected>B2</option>
+                        <option value="C1">C1</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">AI orqali qo'shish</button>
+            </form>
+        </div>
+
+        <!-- 2. Listening qo'shish (AI orqali) -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
+            <h3 class="text-xl font-bold text-white mb-4">Listening Matni (AI orqali)</h3>
+            <form action="/admin/add-listening-ai" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Sarlavha (Title)</label>
+                    <input type="text" name="title" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Audio Text</label>
+                    <textarea name="audio_text" rows="4" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
+                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="A2">A2</option>
+                        <option value="B1">B1</option>
+                        <option value="B2" selected>B2</option>
+                        <option value="C1">C1</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">AI orqali qo'shish</button>
+            </form>
+        </div>
+
+        <!-- 3. Writing mavzusi qo'shish (AI orqali topshiriq generatsiya) -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
+            <h3 class="text-xl font-bold text-white mb-4">Writing Mavzusi (AI orqali)</h3>
+            <form action="/admin/add-writing-ai" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Mavzu Sarlavhasi (Title)</label>
+                    <input type="text" name="title" placeholder="Masalan: The impact of modern technology" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
+                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="A2">A2</option>
+                        <option value="B1">B1</option>
+                        <option value="B2" selected>B2</option>
+                        <option value="C1">C1</option>
+                    </select>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">AI orqali qo'shish</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 4. Speaking mavzusi qo'shish -->
+        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
+            <h3 class="text-xl font-bold text-white mb-4">Speaking Mavzusi</h3>
+            <form action="/admin/add-speaking-topic" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Mavzu sarlavhasi</label>
+                    <input type="text" name="title" placeholder="Masalan: Describe your favorite book" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
+                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="A2">A2</option>
+                        <option value="B1">B1</option>
+                        <option value="B2" selected>B2</option>
+                        <option value="C1">C1</option>
+                    </select>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">Mavzu qo'shish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

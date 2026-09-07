@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-8 max-w-5xl mx-auto">
+    <div class="flex justify-between items-center border-b border-gray-800 pb-6">
+        <div>
+            <h2 class="text-3xl font-black text-white">CEFR Reading Moduli</h2>
+            <p class="text-gray-400 mt-2">Bazadagi mavjud barcha akademik matnlar.</p>
+        </div>
+        <a href="/admin" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Admin Panel</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% if items %}
+            {% for item in items %}
+            <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500/50 transition relative">
+                <!-- O'chirish tugmasi (Har bir kartaning yuqori o'ng burchagida chiqadi) -->
+                <a href="/admin/delete-reading/{{ item.id }}" onclick="return confirm('Haqiqatan ham bu matnni oʻchirmoqchimisiz?')" class="absolute top-4 right-4 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20 px-3 py-1 rounded-lg text-xs font-bold transition">
+                    O'chirish
+                </a>
+
+                <div>
+                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Passage {{ item.id }}</span>
+                    <h3 class="text-xl font-bold text-white mt-4 mb-2 pr-16">{{ item.title }}</h3>
+                    <p class="text-sm text-gray-400 mb-6 line-clamp-2">{{ item.passage_text }}</p>
+                </div>
+                <a href="/reading/{{ item.id }}" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition text-center block">Matnni o'qish</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-span-2 text-center text-gray-500 py-10">
+                Hozircha matnlar qo'shilmagan. <a href="/admin" class="text-emerald-400 underline">Admin paneldan qo'shing</a>.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

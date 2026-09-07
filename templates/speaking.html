@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-8 max-w-5xl mx-auto">
+    <div class="flex justify-between items-center border-b border-gray-800 pb-6">
+        <div>
+            <h2 class="text-3xl font-black text-white">CEFR Speaking Moduli</h2>
+            <p class="text-gray-400 mt-2">Mavzuni tanlang va AI orqali og'zaki nutqingizni (Speaking) tahlil qiling.</p>
+        </div>
+        <a href="/admin" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Admin Panel</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% if topics %}
+            {% for topic in topics %}
+            <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500/50 transition shadow-xl">
+                <div>
+                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Speaking Task #{{ topic.id }}</span>
+                    <h3 class="text-xl font-bold text-white mt-4 mb-4">{{ topic.title }}</h3>
+                </div>
+
+                <div class="pt-4 border-t border-gray-800">
+                    <a href="/speaking/{{ topic.id }}" class="block w-full text-center bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl transition text-sm shadow-lg shadow-emerald-500/10">
+                        🎙️ Speaking mashqini boshlash
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-span-2 text-center text-gray-500 py-10">
+                Hozircha speaking mavzulari yo'q. <a href="/admin" class="text-emerald-400 underline">Admin paneldan qo'shing</a>.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

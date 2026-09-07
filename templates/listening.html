@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-8 max-w-5xl mx-auto">
+    <div class="flex justify-between items-center border-b border-gray-800 pb-6">
+        <div>
+            <h2 class="text-3xl font-black text-white">CEFR Listening Moduli</h2>
+            <p class="text-gray-400 mt-2">Audio matnlar va tushunish testlari.</p>
+        </div>
+        <a href="/admin" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Admin Panel</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% if items %}
+            {% for item in items %}
+            <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500/50 transition relative">
+                <div>
+                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Listening {{ item.id }}</span>
+                    <h3 class="text-xl font-bold text-white mt-4 mb-2">{{ item.title }}</h3>
+                    <p class="text-sm text-gray-400 mb-4 line-clamp-2">{{ item.audio_text }}</p>
+                </div>
+
+                <div class="space-y-3 pt-4 border-t border-gray-800">
+                    <!-- Detal sahifasiga o'tish tugmasi (Asosiy test va tezlik boshqaruvi shu yerda bo'ladi) -->
+                    <a href="/listening/{{ item.id }}" class="block w-full text-center bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl transition text-sm shadow-lg shadow-emerald-500/10">
+                        🎧 Testni boshlash va Ovozni boshqarish
+                    </a>
+
+                    <!-- AI Rejimi tugmasi -->
+                    <button onclick="loadAIHelper('listening', `{{ item.audio_text }}`, {{ item.id }})" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                        🤖 AI Rejimi (Kalit so'zlar)
+                    </button>
+                </div>
+
+                <!-- AI yordamchi natijasi chiqadigan joy -->
+                <div id="ai-helper-box-{{ item.id }}" class="hidden mt-4 p-4 bg-slate-950 border border-indigo-500/30 rounded-xl text-gray-300 space-y-2">
+                    <h4 class="text-indigo-400 font-bold text-xs">AI Tavsiyalari:</h4>
+                    <div id="ai-helper-content-{{ item.id }}" class="whitespace-pre-line text-xs leading-relaxed"></div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-span-2 text-center text-gray-500 py-10">
+                Hozircha listening matnlari yo'q. <a href="/admin" class="text-emerald-400 underline">Admin paneldan qo'shing</a>.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+async function loadAIHelper(moduleType, contentText, itemId) {
+    const box = document.getElementById(`ai-helper-box-${itemId}`);
+    const contentDiv = document.getElementById(`ai-helper-content-${itemId}`);
+
+    box.classList.remove('hidden');
+    contentDiv.innerText = "Tayyorlanmoqda...";
+
+    try {
+        const response = await fetch('/api/ai-helper', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ module_type: moduleType, text_content: contentText })
+        });
+        const data = await response.json();
+        if(response.ok) {
+            contentDiv.innerText = data.ai_help;
+        } else {
+            contentDiv.innerText = "Xatolik yuz berdi.";
+        }
+    } catch(err) {
+        contentDiv.innerText = "Aloqa yo'q.";
+    }
+}
+</script>
+{% endblock %}

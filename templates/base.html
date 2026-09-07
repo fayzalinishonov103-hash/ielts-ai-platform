@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEFR AI Platformasi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-gray-100 min-h-screen flex flex-col justify-between font-sans selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Navbar / Yuqori menyu -->
+    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="/" class="text-xl font-black tracking-wider text-emerald-400 flex items-center space-x-2">
+                <span>🚀 CEFR AI</span>
+            </a>
+            <nav class="flex items-center space-x-6 text-sm font-semibold">
+                <a href="/reading" class="hover:text-emerald-400 transition">Reading</a>
+                <a href="/listening" class="hover:text-emerald-400 transition">Listening</a>
+                <a href="/writing" class="hover:text-emerald-400 transition">Writing</a>
+                <a href="/speaking" class="hover:text-emerald-400 transition">Speaking</a>
+                <a href="/profile" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl hover:bg-emerald-500/20 transition">Profil</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Asosiy kontent qismi -->
+    <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Pastki qism (Footer) -->
+    <footer class="border-t border-gray-800 bg-gray-900/30 text-center py-6 text-xs text-gray-500">
+        <p>&copy; 2026 CEFR AI Platformasi. Barcha huquqlar himoyalangan.</p>
+    </footer>
+
+</body>
+</html>
