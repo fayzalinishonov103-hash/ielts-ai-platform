@@ -40,6 +40,10 @@ def init_db():
                        TEXT,
                        university
                        TEXT,
+                       faculty
+                       TEXT,
+                       specialty
+                       TEXT,
                        birth_date
                        TEXT,
                        address
@@ -182,8 +186,21 @@ async def home_page(request: Request):
 async def admin_page(request: Request, username: str = Depends(get_current_user_cookie)):
     if username != MY_ADMIN_USERNAME:
         return HTMLResponse(
-            content="<h3 style='color:white; background:black; text-align:center; padding:50px;'>Bu sahifaga faqat admin kira oladi! ⚠️</h3>",
-            status_code=403)
+            content="""
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    Swal.fire({
+                        title: 'Ruxsat etilmagan!',
+                        text: 'Bu sahifaga faqat admin kira oladi!',
+                        icon: 'error',
+                        background: '#0f172a',
+                        color: '#fff',
+                        confirmButtonColor: '#ef4444'
+                    }).then(() => { window.location.href = '/'; });
+                </script>
+            """,
+            status_code=403
+        )
     return templates.TemplateResponse(request, "admin.html", {})
 
 
@@ -197,26 +214,57 @@ async def register_user(
         name: str = Form(...),
         username: str = Form(...),
         password: str = Form(...),
-        university: str = Form(None),  # ixtiyoriy bo'lgani uchun bo'sh qolishi mumkin
+        university: str = Form(None),
         birth_date: str = Form(...),
         address: str = Form(...),
         level: str = Form(...)
 ):
     try:
-        # Agar universitet yozilmagan bo'lsa, standart qiymat beramiz
         uni_value = university if university and university.strip() != "" else "Andijan State Technical University"
+        faculty_val = "Intellectual Management and Computer Systems"
+        specialty_val = "Artificial Intelligence"
 
         conn = sqlite3.connect("cefr_database.db")
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO users (name, username, password, university, birth_date, address, level) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (name, username, password, uni_value, birth_date, address, level))
+            "INSERT INTO users (name, username, password, university, faculty, specialty, birth_date, address, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (name, username, password, uni_value, faculty_val, specialty_val, birth_date, address, level))
         conn.commit()
         conn.close()
-        return HTMLResponse(
-            content="<script>alert('Muvaffaqiyatli ro\\'yxatdan o\\'tdingiz!'); window.location.href='/login';</script>")
+        return HTMLResponse(content="""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    title: 'Muvaffaqiyatli!',
+                    text: "Muvaffaqiyatli ro'yxatdan o'tdingiz!",
+                    icon: 'success',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#10b981',
+                    confirmButtonText: 'Tushunarli'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+            </script>
+        """)
     except sqlite3.IntegrityError:
-        return HTMLResponse(content="<script>alert('Bu username allaqachon band!'); window.history.back();</script>")
+        return HTMLResponse(content="""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    title: 'Xatolik!',
+                    text: 'Bu username allaqachon band!',
+                    icon: 'error',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444',
+                    confirmButtonText: 'Qaytadan urinish'
+                }).then(() => {
+                    window.history.back();
+                });
+            </script>
+        """)
+
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
@@ -233,12 +281,42 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
     conn.close()
 
     if user:
-        resp = HTMLResponse(
-            content=f"<script>alert('Xush kelibsiz, {user['name']}!'); window.location.href='/profile';</script>")
+        user_name = user['name']
+        resp = HTMLResponse(content=f"""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({{
+                    title: 'Xush kelibsiz!',
+                    text: 'Xush kelibsiz, {user_name}!',
+                    icon: 'success',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#10b981',
+                    confirmButtonText: 'Boshlash'
+                }}).then(() => {{
+                    window.location.href = '/profile';
+                }});
+            </script>
+        """)
         resp.set_cookie(key="username", value=user["username"])
         return resp
     else:
-        return HTMLResponse(content="<script>alert('Login yoki parol xato!'); window.history.back();</script>")
+        return HTMLResponse(content="""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    title: 'Xatolik!',
+                    text: 'Login yoki parol xato!',
+                    icon: 'error',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444',
+                    confirmButtonText: 'Qaytadan'
+                }).then(() => {
+                    window.history.back();
+                });
+            </script>
+        """)
 
 
 @app.get("/logout")
@@ -254,7 +332,6 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Bazadan foydalanuvchini topamiz
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     user_db = cursor.fetchone()
 
@@ -262,7 +339,6 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
         conn.close()
         return RedirectResponse(url="/login", status_code=303)
 
-    # Modullar sonini hisoblaymiz
     cursor.execute("SELECT COUNT(*) FROM reading")
     reading_count = cursor.fetchone()[0]
     cursor.execute("SELECT COUNT(*) FROM listening")
@@ -273,12 +349,9 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
     speaking_count = cursor.fetchone()[0]
     conn.close()
 
-    # Bazadagi ustunlar mavjudligini tekshirib, xavfsiz o'qiymiz
     user_keys = user_db.keys()
-    user_faculty = user_db["faculty"] if "faculty" in user_keys and user_db[
-        "faculty"] else "Intellectual Management and Computer Systems"
-    user_specialty = user_db["specialty"] if "specialty" in user_keys and user_db[
-        "specialty"] else "Artificial Intelligence"
+    user_faculty = user_db["faculty"] if "faculty" in user_keys and user_db["faculty"] else "Intellectual Management and Computer Systems"
+    user_specialty = user_db["specialty"] if "specialty" in user_keys and user_db["specialty"] else "Artificial Intelligence"
 
     user_info = {
         "name": user_db["name"],
@@ -341,7 +414,19 @@ async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), 
             (title, passage_text, ai_data["question"], ai_data["correct_answer"], level))
         conn.commit()
         conn.close()
-        return HTMLResponse(content="<script>alert('Reading qo\\'shildi!'); window.location.href='/admin';</script>")
+        return HTMLResponse(content="""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    title: 'Muvaffaqiyatli!',
+                    text: 'Reading qo\'shildi!',
+                    icon: 'success',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#10b981'
+                }).then(() => { window.location.href = '/admin'; });
+            </script>
+        """)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -433,7 +518,18 @@ async def delete_reading(item_id: int, username: str = Depends(get_current_user_
     cursor.execute("DELETE FROM reading WHERE id = ?", (item_id,))
     conn.commit()
     conn.close()
-    return HTMLResponse(content="<script>alert('O\\'chirildi!'); window.location.href='/reading';</script>")
+    return HTMLResponse(content="""
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                title: 'O\'chirildi!',
+                icon: 'success',
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#10b981'
+            }).then(() => { window.location.href = '/reading'; });
+        </script>
+    """)
 
 
 # --- 2. LISTENING ---
@@ -457,7 +553,19 @@ async def add_listening_ai(title: str = Form(...), audio_text: str = Form(...), 
             (title, audio_text, ai_data["question"], ai_data["correct_answer"], level))
         conn.commit()
         conn.close()
-        return HTMLResponse(content="<script>alert('Listening qo\\'shildi!'); window.location.href='/admin';</script>")
+        return HTMLResponse(content="""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    title: 'Muvaffaqiyatli!',
+                    text: 'Listening qo\'shildi!',
+                    icon: 'success',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#10b981'
+                }).then(() => { window.location.href = '/admin'; });
+            </script>
+        """)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -552,7 +660,19 @@ async def add_writing_ai(title: str = Form(...), level: str = Form(...),
                        (title, ai_data["prompt_text"], level))
         conn.commit()
         conn.close()
-        return HTMLResponse(content="<script>alert('Writing qo\\'shildi!'); window.location.href='/admin';</script>")
+        return HTMLResponse(content="""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    title: 'Muvaffaqiyatli!',
+                    text: 'Writing qo\'shildi!',
+                    icon: 'success',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#10b981'
+                }).then(() => { window.location.href = '/admin'; });
+            </script>
+        """)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -596,7 +716,18 @@ async def delete_writing(topic_id: int, username: str = Depends(get_current_user
     cursor.execute("DELETE FROM writing_topics WHERE id = ?", (topic_id,))
     conn.commit()
     conn.close()
-    return HTMLResponse(content="<script>alert('O\\'chirildi!'); window.location.href='/writing';</script>")
+    return HTMLResponse(content="""
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                title: 'O\'chirildi!',
+                icon: 'success',
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#10b981'
+            }).then(() => { window.location.href = '/writing'; });
+        </script>
+    """)
 
 
 class WritingCheckRequest(BaseModel):
@@ -626,7 +757,19 @@ async def add_speaking_topic(title: str = Form(...), level: str = Form(...),
     cursor.execute("INSERT INTO speaking_topics (title, level) VALUES (?, ?)", (title, level))
     conn.commit()
     conn.close()
-    return HTMLResponse(content="<script>alert('Speaking qo\\'shildi!'); window.location.href='/admin';</script>")
+    return HTMLResponse(content="""
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                title: 'Muvaffaqiyatli!',
+                text: 'Speaking qo\'shildi!',
+                icon: 'success',
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#10b981'
+            }).then(() => { window.location.href = '/admin'; });
+        </script>
+    """)
 
 
 @app.get("/speaking", response_class=HTMLResponse)
@@ -668,7 +811,18 @@ async def delete_speaking(topic_id: int, username: str = Depends(get_current_use
     cursor.execute("DELETE FROM speaking_topics WHERE id = ?", (topic_id,))
     conn.commit()
     conn.close()
-    return HTMLResponse(content="<script>alert('O\\'chirildi!'); window.location.href='/speaking';</script>")
+    return HTMLResponse(content="""
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                title: 'O\'chirildi!',
+                icon: 'success',
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#10b981'
+            }).then(() => { window.location.href = '/speaking'; });
+        </script>
+    """)
 
 
 class SpeakingCheckRequest(BaseModel):
