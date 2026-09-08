@@ -194,13 +194,13 @@ async def register_page(request: Request):
 
 @app.post("/register")
 async def register_user(
-        fullname: str = Form(...),
+        name: str = Form(...),
         username: str = Form(...),
         password: str = Form(...),
         university: str = Form(None),  # ixtiyoriy bo'lgani uchun bo'sh qolishi mumkin
         birth_date: str = Form(...),
         address: str = Form(...),
-        cefr_level: str = Form(...)
+        level: str = Form(...)
 ):
     try:
         # Agar universitet yozilmagan bo'lsa, standart qiymat beramiz
@@ -210,7 +210,7 @@ async def register_user(
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO users (name, username, password, university, birth_date, address, level) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (fullname, username, password, uni_value, birth_date, address, cefr_level))
+            (name, username, password, uni_value, birth_date, address, level))
         conn.commit()
         conn.close()
         return HTMLResponse(
