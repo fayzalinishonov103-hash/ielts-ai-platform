@@ -700,6 +700,13 @@ async def check_speaking(req: SpeakingCheckRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/admin/analytics", response_class=HTMLResponse)
+async def admin_analytics(request: Request, username: str = Depends(get_current_user_cookie)):
+    # Bu yerda admin ekanligini tekshirish yoki statistikani chiqarish mumkin
+    return templates.TemplateResponse(
+        "admin.html",
+        {"request": request}
+    )
 
 @app.post("/api/transcribe-audio")
 async def transcribe_audio(file: UploadFile = File(...)):
