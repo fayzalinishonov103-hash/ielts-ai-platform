@@ -9,7 +9,7 @@
     <form action="/register" method="POST" class="space-y-4" autocomplete="off">
         <div>
             <label class="block text-xs font-semibold text-gray-300 mb-1">To'liq ism-familiya</label>
-            <input type="text" name="fullname" placeholder="Falonchi Falonchiyev" required
+            <input type="text" name="name" placeholder="Falonchi Falonchiyev" required
                    class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
         </div>
 
@@ -34,14 +34,14 @@
 
         <div>
             <label class="block text-xs font-semibold text-gray-300 mb-1">Universitet / O'quv yurti <span class="text-gray-500 font-normal">(ixtiyoriy)</span></label>
-            <input type="text" name="university" placeholder="Maktab, litsey yoki universitet"
+            <input type="text" name="university" placeholder="Andijan State Technical University"
                    class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
         </div>
 
         <!-- CEFR Darajasini tanlash -->
         <div>
             <label class="block text-xs font-semibold text-gray-300 mb-1">O'zingizning CEFR darajangiz</label>
-            <select name="cefr_level" required
+            <select name="level" required
                     class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
                 <option value="A2" class="bg-slate-900 text-white">A2 - Elementary</option>
                 <option value="B1" class="bg-slate-900 text-white">B1 - Intermediate</option>
@@ -69,7 +69,7 @@
     const birthInput = document.querySelector('input[name="birth_date"]');
     if (birthInput) {
         birthInput.addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, ''); // Faqat raqamlarni olib qolamiz
+            let value = e.target.value.replace(/\D/g, '');
             if (value.length > 2 && value.length <= 4) {
                 value = value.slice(0, 2) + '.' + value.slice(2);
             } else if (value.length > 4) {
