@@ -381,17 +381,20 @@ async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), 
 
 
 @app.get("/reading", response_class=HTMLResponse)
-async def reading_page(request: Request, username: str = Depends(get_current_user_cookie)):
+async def reading_page(request: Request):
+    username = request.cookies.get("username")
+    user_level = "B2"  # Standart daraja
+
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Foydalanuvchi darajasini olish
-    cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
-    user_row = cursor.fetchone()
-    user_level = user_row["level"] if user_row else "B2"
+    if username:
+        cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
+        user_row = cursor.fetchone()
+        if user_row and "level" in user_row.keys():
+            user_level = user_row["level"]
 
-    # Bazadagi jadval nomi 'readings' ekanligiga e'tibor bering
     cursor.execute("SELECT * FROM readings WHERE level = ?", (user_level,))
     items = cursor.fetchall()
     conn.close()
@@ -403,7 +406,7 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
 
 
 @app.get("/reading/{item_id}", response_class=HTMLResponse)
-async def reading_detail(request: Request, item_id: int, username: str = Depends(get_current_user_cookie)):
+async def reading_detail(request: Request, item_id: int):
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
