@@ -58,7 +58,7 @@ def init_db():
                    )
                    """)
 
-    # Reading jadvali (jadval nomi 'reading' ligicha qoldirildi)
+    # Reading jadvali
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS reading
                    (
@@ -144,12 +144,16 @@ def init_db():
                    )
                    """)
 
+    # Barcha jadvallarga level ustuni borligini xavfsiz tekshirib qo'shish
     tables = ["users", "reading", "listening", "writing_topics", "speaking_topics"]
     for table in tables:
-        try:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN level TEXT DEFAULT 'B2'")
-        except sqlite3.OperationalError:
-            pass
+        cursor.execute(f"PRAGMA table_info({table})")
+        columns = [col[1] for col in cursor.fetchall()]
+        if "level" not in columns:
+            try:
+                cursor.execute(f"ALTER TABLE {table} ADD COLUMN level TEXT DEFAULT 'B2'")
+            except Exception:
+                pass
 
     conn.commit()
     conn.close()
@@ -168,7 +172,7 @@ async def get_current_user_cookie(username: Optional[str] = Cookie(None)):
     return username
 
 
-# --- FOYDALANUVCHI DARAJASINI YANGILASH ENDPOINTI ---
+# --- FOYdALANUVCHI DARAJASINI YANGILASH ENDPOINTI ---
 @app.post("/update-level")
 async def update_user_level(level: str = Form(...), username: str = Depends(get_current_user_cookie)):
     if level not in ["A1", "A2", "B1", "B2", "C1", "C2"]:
@@ -340,10 +344,10 @@ class AIHelperRequest(BaseModel):
 async def ai_helper(req: AIHelperRequest):
     try:
         prompt = f"""Sen CEFR va IELTS ekspertisan. Foydalanuvchi {req.module_type} uchun AI yordam rejimini yoqdi. 
-    1. Mavzu bo'yicha eng muhim 5-6 ta kalit so'z va iboralar (inglizcha va o'zbekcha tarjimasi bilan).
-    2. Ushbu mavzuda yuqori ball olish uchun 3 ta maslahat.
-    Material:
-    {req.text_content}"""
+        1. Mavzu bo'yicha eng muhim 5-6 ta kalit so'z va iboralar (inglizcha va o'zbekcha tarjimasi bilan).
+        2. Ushbu mavzuda yuqori ball olish uchun 3 ta maslahat.
+        Material:
+        {req.text_content}"""
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
@@ -362,7 +366,7 @@ async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), 
         raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
     try:
         prompt = f"""Matn asosida 1 ta savol va to'g'ri javob tuz. Matn: "{passage_text}"
-    JSON formatida qaytar: {{"question": "...", "correct_answer": "..."}}"""
+        JSON formatida qaytar: {{"question": "...", "correct_answer": "..."}}"""
         response = client.chat.completions.create(
             model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}],
             temperature=0.3, response_format={"type": "json_object"}
@@ -382,35 +386,36 @@ async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), 
 
 @app.get("/reading", response_class=HTMLResponse)
 async def reading_page(request: Request, username: str = Depends(get_current_user_cookie)):
-    conn = sqlite3.connect("cefr_database.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    # Foydalanuvchi darajasini xavfsiz olish
-    user_level = "B2"
     try:
+        conn = sqlite3.connect("cefr_database.db")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        # Foydalanuvchi darajasini xavfsiz olish
+        user_level = "B2"
         cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
         user_row = cursor.fetchone()
         if user_row and "level" in user_row.keys() and user_row["level"]:
             user_level = user_row["level"]
-    except Exception:
-        pass
 
-    # Reading jadvalidan matnlarni olish (agar level ustuni bo'lmasa ham xato bermaydi)
-    try:
+        # Reading jadvalidan matnlarni daraja bo'yicha olish
         cursor.execute("SELECT * FROM reading WHERE level = ?", (user_level,))
         items = cursor.fetchall()
-    except Exception:
-        # Agar level ustuni bo'yicha xato bo'lsa, hammasini olib keladi
-        cursor.execute("SELECT * FROM reading")
-        items = cursor.fetchall()
 
-    conn.close()
+        # Agar tanlangan darajada matn topilmasa, xato bermasligi uchun barchasini chiqarib turamiz
+        if not items:
+            cursor.execute("SELECT * FROM reading")
+            items = cursor.fetchall()
 
-    return templates.TemplateResponse(
-        "reading.html",
-        {"request": request, "items": items, "user_level": user_level}
-    )
+        conn.close()
+
+        return templates.TemplateResponse(
+            "reading.html",
+            {"request": request, "items": items, "user_level": user_level}
+        )
+    except Exception as e:
+        return HTMLResponse(content=f"<h3 style='color:red; padding:20px;'>Reading sahifasida xatolik: {str(e)}</h3>",
+                            status_code=200)
 
 
 @app.get("/reading/{item_id}", response_class=HTMLResponse)
@@ -418,7 +423,6 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    # Xato to'g'irlandi: 'readings' o'rniga 'reading' yozildi
     cursor.execute("SELECT * FROM reading WHERE id = ?", (item_id,))
     item = cursor.fetchone()
     conn.close()
@@ -450,7 +454,7 @@ async def check_reading_answer(req: ReadingCheckRequest):
 
     try:
         prompt = f"""Savol: "{item['question']}" \nTo'g'ri javob: "{item['correct_answer']}" \nFoydalanuvchi javobi: "{req.user_answer}"
-    Sinonimlar va ma'no jihatidan to'g'riligini tekshir. JSON formatida qaytar: {{"is_correct": true/false, "comment": "..."}}"""
+        Sinonimlar va ma'no jihatidan to'g'riligini tekshir. JSON formatida qaytar: {{"is_correct": true/false, "comment": "..."}}"""
         response = client.chat.completions.create(
             model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}],
             temperature=0.1, response_format={"type": "json_object"}
@@ -481,7 +485,7 @@ async def add_listening_ai(title: str = Form(...), audio_text: str = Form(...), 
         raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
     try:
         prompt = f"""Audio matn asosida 1 ta savol va javob tuz: "{audio_text}"
-    JSON formatida qaytar: {{"question": "...", "correct_answer": "..."}}"""
+        JSON formatida qaytar: {{"question": "...", "correct_answer": "..."}}"""
         response = client.chat.completions.create(
             model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}],
             temperature=0.3, response_format={"type": "json_object"}
@@ -509,6 +513,9 @@ async def listening_page(request: Request, username: str = Depends(get_current_u
     user_level = user_row["level"] if user_row else "B2"
     cursor.execute("SELECT * FROM listening WHERE level = ?", (user_level,))
     items = cursor.fetchall()
+    if not items:
+        cursor.execute("SELECT * FROM listening")
+        items = cursor.fetchall()
     conn.close()
     return templates.TemplateResponse(request, "listening.html",
                                       {"request": request, "items": items, "user_level": user_level})
@@ -545,7 +552,7 @@ async def check_listening_answer(req: ListeningCheckRequest):
 
     try:
         prompt = f"""Savol: "{item['question']}" \nTo'g'ri javob: "{item['correct_answer']}" \nFoydalanuvchi: "{req.user_answer}"
-    JSON formatida qaytar: {{"is_correct": true/false, "comment": "..."}}"""
+        JSON formatida qaytar: {{"is_correct": true/false, "comment": "..."}}"""
         response = client.chat.completions.create(
             model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}],
             temperature=0.1, response_format={"type": "json_object"}
@@ -602,6 +609,9 @@ async def writing_page(request: Request, username: str = Depends(get_current_use
     user_level = user_row["level"] if user_row else "B2"
     cursor.execute("SELECT * FROM writing_topics WHERE level = ?", (user_level,))
     topics = cursor.fetchall()
+    if not topics:
+        cursor.execute("SELECT * FROM writing_topics")
+        topics = cursor.fetchall()
     conn.close()
     return templates.TemplateResponse(request, "writing.html",
                                       {"request": request, "topics": topics, "user_level": user_level})
@@ -672,6 +682,9 @@ async def speaking_page(request: Request, username: str = Depends(get_current_us
     user_level = user_row["level"] if user_row else "B2"
     cursor.execute("SELECT * FROM speaking_topics WHERE level = ?", (user_level,))
     topics = cursor.fetchall()
+    if not topics:
+        cursor.execute("SELECT * FROM speaking_topics")
+        topics = cursor.fetchall()
     conn.close()
     return templates.TemplateResponse(request, "speaking.html",
                                       {"request": request, "topics": topics, "user_level": user_level})
@@ -707,7 +720,7 @@ class SpeakingCheckRequest(BaseModel):
 
 
 @app.post("/check-speaking")
-async def check_speaking(req: SpeakingCheckRequest):
+async def check_speaking(req: SpeakingCheckRequest, username: str = Depends(get_current_user_cookie)):
     try:
         prompt = f"CEFR Speaking ekspertisiz. Transkriptni tahlil qiling va maslahat bering:\n{req.transcript}"
         response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}],
@@ -719,6 +732,8 @@ async def check_speaking(req: SpeakingCheckRequest):
 
 @app.get("/admin/analytics", response_class=HTMLResponse)
 async def admin_analytics(request: Request, username: str = Depends(get_current_user_cookie)):
+    if username != MY_ADMIN_USERNAME:
+        raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
     return templates.TemplateResponse(
         "admin.html",
         {"request": request}
@@ -726,7 +741,7 @@ async def admin_analytics(request: Request, username: str = Depends(get_current_
 
 
 @app.post("/api/transcribe-audio")
-async def transcribe_audio(file: UploadFile = File(...)):
+async def transcribe_audio(file: UploadFile = File(...), username: str = Depends(get_current_user_cookie)):
     try:
         audio_path = f"static/{file.filename}"
         with open(audio_path, "wb") as buffer:
