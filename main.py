@@ -19,6 +19,14 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "YOUR_OPENAI_API_KEY"))
 MY_ADMIN_USERNAME = "nishonov_273"
 
 
+def render(request: Request, name: str, context: dict = None):
+    if context is None:
+        context = {}
+    context["request"] = request
+    template = templates.env.get_template(name)
+    return HTMLResponse(content=template.render(context))
+
+
 def init_db():
     conn = sqlite3.connect("cefr_database.db")
     cursor = conn.cursor()
@@ -119,7 +127,7 @@ async def update_user_level(level: str = Form(...), username: str = Depends(get_
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
-    return templates.TemplateResponse(request, "index.html", {})
+    return render(request, "index.html")
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -141,12 +149,12 @@ async def admin_page(request: Request, username: str = Depends(get_current_user_
             """,
             status_code=403
         )
-    return templates.TemplateResponse(request, "admin.html", {})
+    return render(request, "admin.html")
 
 
 @app.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
-    return templates.TemplateResponse(request, "register.html", {})
+    return render(request, "register.html")
 
 
 @app.post("/register")
@@ -209,11 +217,11 @@ async def register_user(
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse(request, "login.html", {})
+    return render(request, "login.html")
 
 
 @app.post("/login")
-async def login_user(response: Response, username: str = Form(...), password: str = Form(...)):
+async def login_user(username: str = Form(...), password: str = Form(...)):
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -223,8 +231,6 @@ async def login_user(response: Response, username: str = Form(...), password: st
 
     if user:
         user_name = user['name']
-
-        # Cookie'ni to'g'ridan-to'g'ri response obyektiga yozamiz
         resp = HTMLResponse(content=f"""
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
@@ -241,7 +247,7 @@ async def login_user(response: Response, username: str = Form(...), password: st
                 }});
             </script>
         """)
-        resp.set_cookie(key="username", value=user["username"], httponly=True)
+        resp.set_cookie(key="username", value=user["username"])
         return resp
     else:
         return HTMLResponse(content="""
@@ -311,7 +317,7 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
         "writing_count": writing_count,
         "speaking_count": speaking_count
     }
-    return templates.TemplateResponse(request, "profile.html", {"user": user_info})
+    return render(request, "profile.html", {"user": user_info})
 
 
 class AIHelperRequest(BaseModel):
@@ -394,11 +400,7 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
 
         conn.close()
 
-        return templates.TemplateResponse(
-            request,
-            "reading.html",
-            {"items": items, "user_level": user_level}
-        )
+        return render(request, "reading.html", {"items": items, "user_level": user_level})
     except Exception as e:
         return HTMLResponse(content=f"<h3 style='color:red; padding:20px;'>Reading sahifasida xatolik: {str(e)}</h3>", status_code=200)
 
@@ -415,11 +417,7 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
     if not item:
         raise HTTPException(status_code=404, detail="Topilmadi")
 
-    return templates.TemplateResponse(
-        request,
-        "reading_detail.html",
-        {"item": item}
-    )
+    return render(request, "reading_detail.html", {"item": item})
 
 
 class ReadingCheckRequest(BaseModel):
@@ -522,7 +520,7 @@ async def listening_page(request: Request, username: str = Depends(get_current_u
         cursor.execute("SELECT * FROM listening")
         items = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "listening.html", {"items": items, "user_level": user_level})
+    return render(request, "listening.html", {"items": items, "user_level": user_level})
 
 
 @app.get("/listening/{item_id}", response_class=HTMLResponse)
@@ -535,7 +533,7 @@ async def listening_detail(request: Request, item_id: int, username: str = Depen
     conn.close()
     if not item:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "listening_detail.html", {"item": item})
+    return render(request, "listening_detail.html", {"item": item})
 
 
 class ListeningCheckRequest(BaseModel):
@@ -627,7 +625,7 @@ async def writing_page(request: Request, username: str = Depends(get_current_use
         cursor.execute("SELECT * FROM writing_topics")
         topics = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "writing.html", {"topics": topics, "user_level": user_level})
+    return render(request, "writing.html", {"topics": topics, "user_level": user_level})
 
 
 @app.get("/writing/{topic_id}", response_class=HTMLResponse)
@@ -640,7 +638,7 @@ async def writing_detail(request: Request, topic_id: int, username: str = Depend
     conn.close()
     if not topic:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "writing_detail.html", {"topic": topic})
+    return render(request, "writing_detail.html", {"topic": topic})
 
 
 @app.get("/admin/delete-writing/{topic_id}")
@@ -719,7 +717,7 @@ async def speaking_page(request: Request, username: str = Depends(get_current_us
         cursor.execute("SELECT * FROM speaking_topics")
         topics = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "speaking.html", {"topics": topics, "user_level": user_level})
+    return render(request, "speaking.html", {"topics": topics, "user_level": user_level})
 
 
 @app.get("/speaking/{topic_id}", response_class=HTMLResponse)
@@ -732,7 +730,7 @@ async def speaking_detail(request: Request, topic_id: int, username: str = Depen
     conn.close()
     if not topic:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "speaking_detail.html", {"topic": topic})
+    return render(request, "speaking_detail.html", {"topic": topic})
 
 
 @app.get("/admin/delete-speaking/{topic_id}")
