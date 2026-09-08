@@ -24,7 +24,7 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "YOUR_OPENAI_API_KEY"))
 MY_ADMIN_USERNAME = "nishonov_273"
 
 
-# Ma'lumotlar bazasini yaratish va jadvallarni sozlash (Migration qo'shilgan versiyasi)
+# Ma'lumotlar bazasini yaratish va jadvallarni sozlash
 def init_db():
     conn = sqlite3.connect("cefr_database.db")
     cursor = conn.cursor()
@@ -58,7 +58,7 @@ def init_db():
                    )
                    """)
 
-    # Reading jadvali
+    # Reading jadvali (jadval nomi 'reading' ligicha qoldirildi)
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS reading
                    (
@@ -144,7 +144,6 @@ def init_db():
                    )
                    """)
 
-    # Agar eski bazada level ustuni bo'lmasa, uni avtomatik qo'shib ketish (Migration)
     tables = ["users", "reading", "listening", "writing_topics", "speaking_topics"]
     for table in tables:
         try:
@@ -276,7 +275,8 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
     conn.close()
 
     if user:
-        resp = HTMLResponse(content=f"<script>alert('Xush kelibsiz, {user['name']}!'); window.location.href='/profile';</script>")
+        resp = HTMLResponse(
+            content=f"<script>alert('Xush kelibsiz, {user['name']}!'); window.location.href='/profile';</script>")
         resp.set_cookie(key="username", value=user["username"])
         return resp
     else:
@@ -386,13 +386,12 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Foydalanuvchi darajasini olish
     cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
     user_row = cursor.fetchone()
     user_level = user_row["level"] if user_row else "B2"
 
-    # Bazadagi jadval nomi 'readings' ekanligiga e'tibor bering
-    cursor.execute("SELECT * FROM readings WHERE level = ?", (user_level,))
+    # Xato to'g'irlandi: 'readings' o'rniga to'g'ri jadval nomi 'reading' ishlatildi
+    cursor.execute("SELECT * FROM reading WHERE level = ?", (user_level,))
     items = cursor.fetchall()
     conn.close()
 
@@ -407,7 +406,8 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM readings WHERE id = ?", (item_id,))
+    # Xato to'g'irlandi: 'readings' o'rniga 'reading' yozildi
+    cursor.execute("SELECT * FROM reading WHERE id = ?", (item_id,))
     item = cursor.fetchone()
     conn.close()
 
@@ -418,6 +418,7 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
         "reading_detail.html",
         {"request": request, "item": item}
     )
+
 
 class ReadingCheckRequest(BaseModel):
     item_id: int
@@ -497,7 +498,8 @@ async def listening_page(request: Request, username: str = Depends(get_current_u
     cursor.execute("SELECT * FROM listening WHERE level = ?", (user_level,))
     items = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "listening.html", {"items": items, "user_level": user_level})
+    return templates.TemplateResponse(request, "listening.html",
+                                      {"request": request, "items": items, "user_level": user_level})
 
 
 @app.get("/listening/{item_id}", response_class=HTMLResponse)
@@ -510,7 +512,7 @@ async def listening_detail(request: Request, item_id: int, username: str = Depen
     conn.close()
     if not item:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "listening_detail.html", {"item": item})
+    return templates.TemplateResponse(request, "listening_detail.html", {"request": request, "item": item})
 
 
 class ListeningCheckRequest(BaseModel):
@@ -589,7 +591,8 @@ async def writing_page(request: Request, username: str = Depends(get_current_use
     cursor.execute("SELECT * FROM writing_topics WHERE level = ?", (user_level,))
     topics = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "writing.html", {"topics": topics, "user_level": user_level})
+    return templates.TemplateResponse(request, "writing.html",
+                                      {"request": request, "topics": topics, "user_level": user_level})
 
 
 @app.get("/writing/{topic_id}", response_class=HTMLResponse)
@@ -602,7 +605,7 @@ async def writing_detail(request: Request, topic_id: int, username: str = Depend
     conn.close()
     if not topic:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "writing_detail.html", {"topic": topic})
+    return templates.TemplateResponse(request, "writing_detail.html", {"request": request, "topic": topic})
 
 
 @app.get("/admin/delete-writing/{topic_id}")
@@ -658,7 +661,8 @@ async def speaking_page(request: Request, username: str = Depends(get_current_us
     cursor.execute("SELECT * FROM speaking_topics WHERE level = ?", (user_level,))
     topics = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "speaking.html", {"topics": topics, "user_level": user_level})
+    return templates.TemplateResponse(request, "speaking.html",
+                                      {"request": request, "topics": topics, "user_level": user_level})
 
 
 @app.get("/speaking/{topic_id}", response_class=HTMLResponse)
@@ -671,7 +675,7 @@ async def speaking_detail(request: Request, topic_id: int, username: str = Depen
     conn.close()
     if not topic:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "speaking_detail.html", {"topic": topic})
+    return templates.TemplateResponse(request, "speaking_detail.html", {"request": request, "topic": topic})
 
 
 @app.get("/admin/delete-speaking/{topic_id}")
@@ -699,6 +703,14 @@ async def check_speaking(req: SpeakingCheckRequest):
         return {"feedback": response.choices[0].message.content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/admin/analytics", response_class=HTMLResponse)
+async def admin_analytics(request: Request, username: str = Depends(get_current_user_cookie)):
+    return templates.TemplateResponse(
+        "admin.html",
+        {"request": request}
+    )
 
 
 @app.post("/api/transcribe-audio")
