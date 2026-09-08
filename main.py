@@ -386,13 +386,25 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
-    user_row = cursor.fetchone()
-    user_level = user_row["level"] if user_row else "B2"
+    # Foydalanuvchi darajasini xavfsiz olish
+    user_level = "B2"
+    try:
+        cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
+        user_row = cursor.fetchone()
+        if user_row and "level" in user_row.keys() and user_row["level"]:
+            user_level = user_row["level"]
+    except Exception:
+        pass
 
-    # Xato to'g'irlandi: 'readings' o'rniga to'g'ri jadval nomi 'reading' ishlatildi
-    cursor.execute("SELECT * FROM reading WHERE level = ?", (user_level,))
-    items = cursor.fetchall()
+    # Reading jadvalidan matnlarni olish (agar level ustuni bo'lmasa ham xato bermaydi)
+    try:
+        cursor.execute("SELECT * FROM reading WHERE level = ?", (user_level,))
+        items = cursor.fetchall()
+    except Exception:
+        # Agar level ustuni bo'yicha xato bo'lsa, hammasini olib keladi
+        cursor.execute("SELECT * FROM reading")
+        items = cursor.fetchall()
+
     conn.close()
 
     return templates.TemplateResponse(
