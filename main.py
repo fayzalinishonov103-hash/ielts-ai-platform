@@ -373,13 +373,16 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
     if not item:
         raise HTTPException(status_code=404, detail="Topilmadi")
 
-    return templates.TemplateResponse(request, "reading_detail.html", {"item": item})
+    return templates.TemplateResponse(
+        request,
+        "reading_detail.html",
+        {"item": item}
+    )
 
 
 class ReadingCheckRequest(BaseModel):
     item_id: int
     user_answer: str
-
 
 @app.post("/api/check-reading")
 async def check_reading_answer(req: ReadingCheckRequest):
@@ -403,7 +406,6 @@ async def check_reading_answer(req: ReadingCheckRequest):
         return {"is_correct": result.get("is_correct", False), "comment": result.get("comment", "")}
     except Exception:
         return {"is_correct": req.user_answer.strip().lower() == item["correct_answer"].strip().lower(), "comment": ""}
-
 
 @app.get("/admin/delete-reading/{item_id}")
 async def delete_reading(item_id: int, username: str = Depends(get_current_user_cookie)):
