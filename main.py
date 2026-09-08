@@ -381,24 +381,29 @@ async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), 
 
 
 @app.get("/reading", response_class=HTMLResponse)
-async def reading_page(request: Request):
+async def reading_page(request: Request, username: str = Depends(get_current_user_cookie)):
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Darajani tekshirmasdan barcha readings matnlarini olib kelamiz
-    cursor.execute("SELECT * FROM readings")
+    # Foydalanuvchi darajasini olish
+    cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
+    user_row = cursor.fetchone()
+    user_level = user_row["level"] if user_row else "B2"
+
+    # Bazadagi jadval nomi 'readings' ekanligiga e'tibor bering
+    cursor.execute("SELECT * FROM readings WHERE level = ?", (user_level,))
     items = cursor.fetchall()
     conn.close()
 
     return templates.TemplateResponse(
         "reading.html",
-        {"request": request, "items": items, "user_level": "B2"}
+        {"request": request, "items": items, "user_level": user_level}
     )
 
 
 @app.get("/reading/{item_id}", response_class=HTMLResponse)
-async def reading_detail(request: Request, item_id: int):
+async def reading_detail(request: Request, item_id: int, username: str = Depends(get_current_user_cookie)):
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -695,13 +700,6 @@ async def check_speaking(req: SpeakingCheckRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/admin/analytics", response_class=HTMLResponse)
-async def admin_analytics(request: Request, username: str = Depends(get_current_user_cookie)):
-    # Bu yerda admin ekanligini tekshirish yoki statistikani chiqarish mumkin
-    return templates.TemplateResponse(
-        "admin.html",
-        {"request": request}
-    )
 
 @app.post("/api/transcribe-audio")
 async def transcribe_audio(file: UploadFile = File(...)):
