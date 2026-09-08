@@ -1,7 +1,6 @@
 import os
 import json
 import sqlite3
-import re
 from fastapi import FastAPI, Request, Form, HTTPException, Response, Cookie, Depends, status, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -13,23 +12,17 @@ from typing import Optional
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# 1. Statik papkani avtomatik yaratish va ulash
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# OpenAI klientini sozlash
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "YOUR_OPENAI_API_KEY"))
-
-# O'zingizning yagona admin username'ingiz
 MY_ADMIN_USERNAME = "nishonov_273"
 
 
-# Ma'lumotlar bazasini yaratish va jadvallarni sozlash
 def init_db():
     conn = sqlite3.connect("cefr_database.db")
     cursor = conn.cursor()
 
-    # Foydalanuvchilar jadvali
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS users
                    (
@@ -58,7 +51,6 @@ def init_db():
                    )
                    """)
 
-    # Reading jadvali
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS reading
                    (
@@ -82,7 +74,6 @@ def init_db():
                    )
                    """)
 
-    # Listening jadvali
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS listening
                    (
@@ -106,7 +97,6 @@ def init_db():
                    )
                    """)
 
-    # Writing jadvali
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS writing_topics
                    (
@@ -126,7 +116,6 @@ def init_db():
                    )
                    """)
 
-    # Speaking jadvali
     cursor.execute("""
                    CREATE TABLE IF NOT EXISTS speaking_topics
                    (
@@ -144,7 +133,6 @@ def init_db():
                    )
                    """)
 
-    # Barcha jadvallarga level ustuni borligini xavfsiz tekshirib qo'shish
     tables = ["users", "reading", "listening", "writing_topics", "speaking_topics"]
     for table in tables:
         cursor.execute(f"PRAGMA table_info({table})")
@@ -162,7 +150,6 @@ def init_db():
 init_db()
 
 
-# --- AUTORIZATSIYANI TEKSHIRUVCHI FUNKSIYA ---
 async def get_current_user_cookie(username: Optional[str] = Cookie(None)):
     if not username:
         raise HTTPException(
@@ -172,7 +159,6 @@ async def get_current_user_cookie(username: Optional[str] = Cookie(None)):
     return username
 
 
-# --- FOYdALANUVCHI DARAJASINI YANGILASH ENDPOINTI ---
 @app.post("/update-level")
 async def update_user_level(level: str = Form(...), username: str = Depends(get_current_user_cookie)):
     if level not in ["A1", "A2", "B1", "B2", "C1", "C2"]:
@@ -187,8 +173,6 @@ async def update_user_level(level: str = Form(...), username: str = Depends(get_
     return RedirectResponse(url="/reading", status_code=303)
 
 
-# --- ASOSIY SAHIFALAR ---
-
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
     return templates.TemplateResponse(request, "index.html", {})
@@ -202,43 +186,6 @@ async def admin_page(request: Request, username: str = Depends(get_current_user_
             status_code=403)
     return templates.TemplateResponse(request, "admin.html", {})
 
-
-@app.get("/admin/users", response_class=HTMLResponse)
-async def admin_users_page(request: Request, username: str = Depends(get_current_user_cookie)):
-    if username != MY_ADMIN_USERNAME:
-        raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
-
-    conn = sqlite3.connect("cefr_database.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name, username, university, birth_date, address, level FROM users")
-    users = cursor.fetchall()
-    conn.close()
-
-    html_content = """
-        <!DOCTYPE html>
-        <html lang="uz">
-        <head>
-            <meta charset="UTF-8">
-            <title>Foydalanuvchilar Ro'yxati</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body class="container mt-5 bg-dark text-white">
-            <h2>Ro'yxatdan o'tgan foydalanuvchilar</h2>
-            <a href="/admin" class="btn btn-secondary mb-3">Admin Panelga qaytish</a>
-            <table class="table table-dark table-bordered table-striped">
-                <thead>
-                    <tr><th>ID</th><th>Ism</th><th>Username</th><th>Universitet</th><th>Tug'ilgan sana</th><th>Manzil</th><th>Daraja</th></tr>
-                </thead>
-                <tbody>
-        """
-    for u in users:
-        html_content += f"<tr><td>{u['id']}</td><td>{u['name']}</td><td>{u['username']}</td><td>{u['university']}</td><td>{u['birth_date']}</td><td>{u['address']}</td><td>{u['level']}</td></tr>"
-    html_content += "</tbody></table></body></html>"
-    return HTMLResponse(content=html_content)
-
-
-# --- AUTORIZATSIYA ---
 
 @app.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
@@ -294,7 +241,6 @@ async def logout():
     return resp
 
 
-# --- PROFIL ---
 @app.get("/profile", response_class=HTMLResponse)
 async def profile_page(request: Request, username: str = Depends(get_current_user_cookie)):
     conn = sqlite3.connect("cefr_database.db")
@@ -334,7 +280,6 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
     return templates.TemplateResponse(request, "profile.html", {"user": user_info})
 
 
-# --- AI HELPER ---
 class AIHelperRequest(BaseModel):
     text_content: str
     module_type: str
@@ -358,7 +303,7 @@ async def ai_helper(req: AIHelperRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --- 1. READING MODULI ---
+# --- 1. READING ---
 @app.post("/admin/add-reading-ai")
 async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), level: str = Form(...),
                          username: str = Depends(get_current_user_cookie)):
@@ -391,18 +336,15 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        # Foydalanuvchi darajasini xavfsiz olish
         user_level = "B2"
         cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
         user_row = cursor.fetchone()
         if user_row and "level" in user_row.keys() and user_row["level"]:
             user_level = user_row["level"]
 
-        # Reading jadvalidan matnlarni daraja bo'yicha olish
         cursor.execute("SELECT * FROM reading WHERE level = ?", (user_level,))
         items = cursor.fetchall()
 
-        # Agar tanlangan darajada matn topilmasa, xato bermasligi uchun barchasini chiqarib turamiz
         if not items:
             cursor.execute("SELECT * FROM reading")
             items = cursor.fetchall()
@@ -410,8 +352,9 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
         conn.close()
 
         return templates.TemplateResponse(
+            request,
             "reading.html",
-            {"request": request, "items": items, "user_level": user_level}
+            {"items": items, "user_level": user_level}
         )
     except Exception as e:
         return HTMLResponse(content=f"<h3 style='color:red; padding:20px;'>Reading sahifasida xatolik: {str(e)}</h3>",
@@ -430,10 +373,7 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
     if not item:
         raise HTTPException(status_code=404, detail="Topilmadi")
 
-    return templates.TemplateResponse(
-        "reading_detail.html",
-        {"request": request, "item": item}
-    )
+    return templates.TemplateResponse(request, "reading_detail.html", {"item": item})
 
 
 class ReadingCheckRequest(BaseModel):
@@ -477,7 +417,7 @@ async def delete_reading(item_id: int, username: str = Depends(get_current_user_
     return HTMLResponse(content="<script>alert('O\\'chirildi!'); window.location.href='/reading';</script>")
 
 
-# --- 2. LISTENING MODULI ---
+# --- 2. LISTENING ---
 @app.post("/admin/add-listening-ai")
 async def add_listening_ai(title: str = Form(...), audio_text: str = Form(...), level: str = Form(...),
                            username: str = Depends(get_current_user_cookie)):
@@ -517,8 +457,7 @@ async def listening_page(request: Request, username: str = Depends(get_current_u
         cursor.execute("SELECT * FROM listening")
         items = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "listening.html",
-                                      {"request": request, "items": items, "user_level": user_level})
+    return templates.TemplateResponse(request, "listening.html", {"items": items, "user_level": user_level})
 
 
 @app.get("/listening/{item_id}", response_class=HTMLResponse)
@@ -531,7 +470,7 @@ async def listening_detail(request: Request, item_id: int, username: str = Depen
     conn.close()
     if not item:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "listening_detail.html", {"request": request, "item": item})
+    return templates.TemplateResponse(request, "listening_detail.html", {"item": item})
 
 
 class ListeningCheckRequest(BaseModel):
@@ -575,7 +514,7 @@ async def text_to_speech(data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --- 3. WRITING MODULI ---
+# --- 3. WRITING ---
 @app.post("/admin/add-writing-ai")
 async def add_writing_ai(title: str = Form(...), level: str = Form(...),
                          username: str = Depends(get_current_user_cookie)):
@@ -613,8 +552,7 @@ async def writing_page(request: Request, username: str = Depends(get_current_use
         cursor.execute("SELECT * FROM writing_topics")
         topics = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "writing.html",
-                                      {"request": request, "topics": topics, "user_level": user_level})
+    return templates.TemplateResponse(request, "writing.html", {"topics": topics, "user_level": user_level})
 
 
 @app.get("/writing/{topic_id}", response_class=HTMLResponse)
@@ -627,7 +565,7 @@ async def writing_detail(request: Request, topic_id: int, username: str = Depend
     conn.close()
     if not topic:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "writing_detail.html", {"request": request, "topic": topic})
+    return templates.TemplateResponse(request, "writing_detail.html", {"topic": topic})
 
 
 @app.get("/admin/delete-writing/{topic_id}")
@@ -658,7 +596,7 @@ async def check_writing(req: WritingCheckRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# --- 4. SPEAKING MODULI ---
+# --- 4. SPEAKING ---
 @app.post("/admin/add-speaking-topic")
 async def add_speaking_topic(title: str = Form(...), level: str = Form(...),
                              username: str = Depends(get_current_user_cookie)):
@@ -686,8 +624,7 @@ async def speaking_page(request: Request, username: str = Depends(get_current_us
         cursor.execute("SELECT * FROM speaking_topics")
         topics = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "speaking.html",
-                                      {"request": request, "topics": topics, "user_level": user_level})
+    return templates.TemplateResponse(request, "speaking.html", {"topics": topics, "user_level": user_level})
 
 
 @app.get("/speaking/{topic_id}", response_class=HTMLResponse)
@@ -700,7 +637,7 @@ async def speaking_detail(request: Request, topic_id: int, username: str = Depen
     conn.close()
     if not topic:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "speaking_detail.html", {"request": request, "topic": topic})
+    return templates.TemplateResponse(request, "speaking_detail.html", {"topic": topic})
 
 
 @app.get("/admin/delete-speaking/{topic_id}")
@@ -728,16 +665,6 @@ async def check_speaking(req: SpeakingCheckRequest, username: str = Depends(get_
         return {"feedback": response.choices[0].message.content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/admin/analytics", response_class=HTMLResponse)
-async def admin_analytics(request: Request, username: str = Depends(get_current_user_cookie)):
-    if username != MY_ADMIN_USERNAME:
-        raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
-    return templates.TemplateResponse(
-        "admin.html",
-        {"request": request}
-    )
 
 
 @app.post("/api/transcribe-audio")
