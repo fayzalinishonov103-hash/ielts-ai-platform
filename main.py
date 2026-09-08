@@ -32,58 +32,118 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            username TEXT UNIQUE,
-            password TEXT,
-            university TEXT,
-            faculty TEXT,
-            specialty TEXT,
-            birth_date TEXT,
-            address TEXT,
-            level TEXT DEFAULT 'B2'
-        )
-    """)
+                   CREATE TABLE IF NOT EXISTS users
+                   (
+                       id
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       name
+                       TEXT,
+                       username
+                       TEXT
+                       UNIQUE,
+                       password
+                       TEXT,
+                       university
+                       TEXT,
+                       faculty
+                       TEXT,
+                       specialty
+                       TEXT,
+                       birth_date
+                       TEXT,
+                       address
+                       TEXT,
+                       level
+                       TEXT
+                       DEFAULT
+                       'B2'
+                   )
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS reading (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            passage_text TEXT,
-            question TEXT,
-            correct_answer TEXT,
-            level TEXT DEFAULT 'B2'
-        )
-    """)
+                   CREATE TABLE IF NOT EXISTS reading
+                   (
+                       id
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       title
+                       TEXT,
+                       passage_text
+                       TEXT,
+                       question
+                       TEXT,
+                       correct_answer
+                       TEXT,
+                       level
+                       TEXT
+                       DEFAULT
+                       'B2'
+                   )
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS listening (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            audio_text TEXT,
-            question TEXT,
-            correct_answer TEXT,
-            level TEXT DEFAULT 'B2'
-        )
-    """)
+                   CREATE TABLE IF NOT EXISTS listening
+                   (
+                       id
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       title
+                       TEXT,
+                       audio_text
+                       TEXT,
+                       question
+                       TEXT,
+                       correct_answer
+                       TEXT,
+                       level
+                       TEXT
+                       DEFAULT
+                       'B2'
+                   )
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS writing_topics (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            prompt_text TEXT,
-            level TEXT DEFAULT 'B2'
-        )
-    """)
+                   CREATE TABLE IF NOT EXISTS writing_topics
+                   (
+                       id
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       title
+                       TEXT,
+                       prompt_text
+                       TEXT,
+                       level
+                       TEXT
+                       DEFAULT
+                       'B2'
+                   )
+                   """)
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS speaking_topics (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            level TEXT DEFAULT 'B2'
-        )
-    """)
+                   CREATE TABLE IF NOT EXISTS speaking_topics
+                   (
+                       id
+                       INTEGER
+                       PRIMARY
+                       KEY
+                       AUTOINCREMENT,
+                       title
+                       TEXT,
+                       level
+                       TEXT
+                       DEFAULT
+                       'B2'
+                   )
+                   """)
 
     tables = ["users", "reading", "listening", "writing_topics", "speaking_topics"]
     for table in tables:
@@ -232,24 +292,6 @@ async def register_user(
             </script>
         """)
 
-    except sqlite3.IntegrityError:
-        return HTMLResponse(content="""
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    title: 'Xatolik!',
-                    text: 'Bu username allaqachon band!',
-                    icon: 'error',
-                    background: '#0f172a',
-                    color: '#fff',
-                    confirmButtonColor: '#ef4444',
-                    confirmButtonText: 'Qaytadan urinish'
-                }).then(() => {
-                    window.history.back();
-                });
-            </script>
-        """)
-
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
@@ -335,8 +377,10 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
     conn.close()
 
     user_keys = user_db.keys()
-    user_faculty = user_db["faculty"] if "faculty" in user_keys and user_db["faculty"] else "Intellectual Management and Computer Systems"
-    user_specialty = user_db["specialty"] if "specialty" in user_keys and user_db["specialty"] else "Artificial Intelligence"
+    user_faculty = user_db["faculty"] if "faculty" in user_keys and user_db[
+        "faculty"] else "Intellectual Management and Computer Systems"
+    user_specialty = user_db["specialty"] if "specialty" in user_keys and user_db[
+        "specialty"] else "Artificial Intelligence"
 
     user_info = {
         "name": user_db["name"],
@@ -360,6 +404,7 @@ class AIHelperRequest(BaseModel):
     text_content: str
     module_type: str
 
+
 @app.post("/api/ai-helper")
 async def ai_helper(req: AIHelperRequest):
     try:
@@ -380,7 +425,8 @@ async def ai_helper(req: AIHelperRequest):
 
 # --- 1. READING ---
 @app.post("/admin/add-reading-ai")
-async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), level: str = Form(...), username: str = Depends(get_current_user_cookie)):
+async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), level: str = Form(...),
+                         username: str = Depends(get_current_user_cookie)):
     if username != MY_ADMIN_USERNAME:
         raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
     try:
@@ -393,8 +439,9 @@ async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), 
         ai_data = json.loads(response.choices[0].message.content.strip())
         conn = sqlite3.connect("cefr_database.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO reading (title, passage_text, question, correct_answer, level) VALUES (?, ?, ?, ?, ?)",
-                       (title, passage_text, ai_data["question"], ai_data["correct_answer"], level))
+        cursor.execute(
+            "INSERT INTO reading (title, passage_text, question, correct_answer, level) VALUES (?, ?, ?, ?, ?)",
+            (title, passage_text, ai_data["question"], ai_data["correct_answer"], level))
         conn.commit()
         conn.close()
         return HTMLResponse(content="""
@@ -438,7 +485,8 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
 
         return render(request, "reading.html", {"items": items, "user_level": user_level})
     except Exception as e:
-        return HTMLResponse(content=f"<h3 style='color:red; padding:20px;'>Reading sahifasida xatolik: {str(e)}</h3>", status_code=200)
+        return HTMLResponse(content=f"<h3 style='color:red; padding:20px;'>Reading sahifasida xatolik: {str(e)}</h3>",
+                            status_code=200)
 
 
 @app.get("/reading/{item_id}", response_class=HTMLResponse)
@@ -459,6 +507,7 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
 class ReadingCheckRequest(BaseModel):
     item_id: int
     user_answer: str
+
 
 @app.post("/api/check-reading")
 async def check_reading_answer(req: ReadingCheckRequest):
@@ -482,6 +531,7 @@ async def check_reading_answer(req: ReadingCheckRequest):
         return {"is_correct": result.get("is_correct", False), "comment": result.get("comment", "")}
     except Exception:
         return {"is_correct": req.user_answer.strip().lower() == item["correct_answer"].strip().lower(), "comment": ""}
+
 
 @app.get("/admin/delete-reading/{item_id}")
 async def delete_reading(item_id: int, username: str = Depends(get_current_user_cookie)):
@@ -508,7 +558,8 @@ async def delete_reading(item_id: int, username: str = Depends(get_current_user_
 
 # --- 2. LISTENING ---
 @app.post("/admin/add-listening-ai")
-async def add_listening_ai(title: str = Form(...), audio_text: str = Form(...), level: str = Form(...), username: str = Depends(get_current_user_cookie)):
+async def add_listening_ai(title: str = Form(...), audio_text: str = Form(...), level: str = Form(...),
+                           username: str = Depends(get_current_user_cookie)):
     if username != MY_ADMIN_USERNAME:
         raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
     try:
@@ -521,8 +572,9 @@ async def add_listening_ai(title: str = Form(...), audio_text: str = Form(...), 
         ai_data = json.loads(response.choices[0].message.content.strip())
         conn = sqlite3.connect("cefr_database.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO listening (title, audio_text, question, correct_answer, level) VALUES (?, ?, ?, ?, ?)",
-                       (title, audio_text, ai_data["question"], ai_data["correct_answer"], level))
+        cursor.execute(
+            "INSERT INTO listening (title, audio_text, question, correct_answer, level) VALUES (?, ?, ?, ?, ?)",
+            (title, audio_text, ai_data["question"], ai_data["correct_answer"], level))
         conn.commit()
         conn.close()
         return HTMLResponse(content="""
@@ -576,6 +628,7 @@ class ListeningCheckRequest(BaseModel):
     item_id: int
     user_answer: str
 
+
 @app.post("/api/check-listening")
 async def check_listening_answer(req: ListeningCheckRequest):
     conn = sqlite3.connect("cefr_database.db")
@@ -614,7 +667,8 @@ async def text_to_speech(data: dict):
 
 # --- 3. WRITING ---
 @app.post("/admin/add-writing-ai")
-async def add_writing_ai(title: str = Form(...), level: str = Form(...), username: str = Depends(get_current_user_cookie)):
+async def add_writing_ai(title: str = Form(...), level: str = Form(...),
+                         username: str = Depends(get_current_user_cookie)):
     if username != MY_ADMIN_USERNAME:
         raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
     try:
@@ -704,11 +758,13 @@ class WritingCheckRequest(BaseModel):
     essay_text: str
     level: str = "B2"
 
+
 @app.post("/check-writing")
 async def check_writing(req: WritingCheckRequest):
     try:
         prompt = f"CEFR Writing ekspertisiz. Esseni tahlil qiling va o'zbek tilida batafsil baho bering:\n{req.essay_text}"
-        response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}], temperature=0.4)
+        response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}],
+                                                  temperature=0.4)
         return {"feedback": response.choices[0].message.content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -716,7 +772,8 @@ async def check_writing(req: WritingCheckRequest):
 
 # --- 4. SPEAKING ---
 @app.post("/admin/add-speaking-topic")
-async def add_speaking_topic(title: str = Form(...), level: str = Form(...), username: str = Depends(get_current_user_cookie)):
+async def add_speaking_topic(title: str = Form(...), level: str = Form(...),
+                             username: str = Depends(get_current_user_cookie)):
     if username != MY_ADMIN_USERNAME:
         raise HTTPException(status_code=403, detail="Ruxsat etilmagan")
     conn = sqlite3.connect("cefr_database.db")
@@ -795,11 +852,13 @@ async def delete_speaking(topic_id: int, username: str = Depends(get_current_use
 class SpeakingCheckRequest(BaseModel):
     transcript: str
 
+
 @app.post("/check-speaking")
 async def check_speaking(req: SpeakingCheckRequest, username: str = Depends(get_current_user_cookie)):
     try:
         prompt = f"CEFR Speaking ekspertisiz. Transkriptni tahlil qiling va maslahat bering:\n{req.transcript}"
-        response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}], temperature=0.4)
+        response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}],
+                                                  temperature=0.4)
         return {"feedback": response.choices[0].message.content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -807,8 +866,8 @@ async def check_speaking(req: SpeakingCheckRequest, username: str = Depends(get_
 
 @app.post("/api/transcribe-audio")
 async def transcribe_audio(file: UploadFile = File(...), username: str = Depends(get_current_user_cookie)):
+    audio_path = f"static/{file.filename}"
     try:
-        audio_path = f"static/{file.filename}"
         with open(audio_path, "wb") as buffer:
             buffer.write(await file.read())
 
@@ -818,9 +877,9 @@ async def transcribe_audio(file: UploadFile = File(...), username: str = Depends
                 file=audio_file
             )
 
-        if os.path.exists(audio_path):
-            os.remove(audio_path)
-
         return {"transcript": transcript_response.text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if os.path.exists(audio_path):
+            os.remove(audio_path)
