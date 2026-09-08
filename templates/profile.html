@@ -4,12 +4,16 @@
     <!-- Profil Sarlavhasi / Asosiy Ma'lumot -->
     <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-8 rounded-2xl shadow-xl flex flex-col md:flex-row items-center gap-6">
         <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-emerald-500 to-blue-600 flex items-center justify-center text-slate-950 font-black text-3xl shadow-lg shadow-emerald-500/20">
-            FN
+            {% if user.name %}
+                {{ user.name[:2].upper() }}
+            {% else %}
+                U
+            {% endif %}
         </div>
 
         <div class="text-center md:text-left space-y-2 flex-grow">
             <h1 class="text-2xl font-black text-white">{{ user.name }}</h1>
-            <p class="text-sm text-gray-400">{{ user.university }} • {{ user.specialization }}</p>
+            <p class="text-sm text-gray-400">{{ user.university }} • {{ user.specialty if user.specialty else "Mutaxassislik kiritilmagan" }}</p>
             <div class="flex flex-wrap justify-center md:justify-start gap-2 pt-1">
                 <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Daraja: {{ user.level }}</span>
                 <span class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Username: @{{ user.username }}</span>
@@ -24,19 +28,19 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Jami Materiallar</p>
-            <h3 class="text-3xl font-black text-white">{{ user.total_tasks }}</h3>
+            <h3 class="text-3xl font-black text-white">{{ user.total_tasks if user.total_tasks else 0 }}</h3>
         </div>
         <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Reading</p>
-            <h3 class="text-3xl font-black text-emerald-400">{{ user.reading_count }}</h3>
+            <h3 class="text-3xl font-black text-emerald-400">{{ user.reading_count if user.reading_count else 0 }}</h3>
         </div>
         <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Listening</p>
-            <h3 class="text-3xl font-black text-blue-400">{{ user.listening_count }}</h3>
+            <h3 class="text-3xl font-black text-blue-400">{{ user.listening_count if user.listening_count else 0 }}</h3>
         </div>
         <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Writing</p>
-            <h3 class="text-3xl font-black text-purple-400">{{ user.writing_count }}</h3>
+            <h3 class="text-3xl font-black text-purple-400">{{ user.writing_count if user.writing_count else 0 }}</h3>
         </div>
     </div>
 
@@ -46,8 +50,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
             <div><span class="text-gray-500">Tug'ilgan sana:</span> {{ user.birth_date }}</div>
             <div><span class="text-gray-500">Manzil:</span> {{ user.address }}</div>
-            <div><span class="text-gray-500">Fakultet:</span> Intellectual Management and Computer Systems</div>
-            <div><span class="text-gray-500">Mutaxassislik:</span> Artificial Intelligence</div>
+            <div><span class="text-gray-500">Fakultet:</span> {{ user.faculty if user.faculty else "Ko'rsatilmagan" }}</div>
+            <div><span class="text-gray-500">Mutaxassislik:</span> {{ user.specialty if user.specialty else "Ko'rsatilmagan" }}</div>
         </div>
     </div>
 </div>

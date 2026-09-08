@@ -253,9 +253,16 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+
+    # Bazadan foydalanuvchini topamiz
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     user_db = cursor.fetchone()
 
+    if not user_db:
+        conn.close()
+        return RedirectResponse(url="/login", status_code=303)
+
+    # Modullar sonini hisoblaymiz
     cursor.execute("SELECT COUNT(*) FROM reading")
     reading_count = cursor.fetchone()[0]
     cursor.execute("SELECT COUNT(*) FROM listening")
@@ -266,15 +273,19 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
     speaking_count = cursor.fetchone()[0]
     conn.close()
 
-    if not user_db:
-        return RedirectResponse(url="/login", status_code=303)
+    # Bazadagi ustunlar mavjudligini tekshirib, xavfsiz o'qiymiz
+    user_keys = user_db.keys()
+    user_faculty = user_db["faculty"] if "faculty" in user_keys and user_db[
+        "faculty"] else "Intellectual Management and Computer Systems"
+    user_specialty = user_db["specialty"] if "specialty" in user_keys and user_db[
+        "specialty"] else "Artificial Intelligence"
 
     user_info = {
         "name": user_db["name"],
         "username": user_db["username"],
         "university": user_db["university"] or "Andijan State Technical University",
-        "faculty": "Intellectual Management and Computer Systems",
-        "specialization": "Artificial Intelligence",
+        "faculty": user_faculty,
+        "specialty": user_specialty,
         "birth_date": user_db["birth_date"],
         "address": user_db["address"],
         "level": user_db["level"],
@@ -284,13 +295,12 @@ async def profile_page(request: Request, username: str = Depends(get_current_use
         "writing_count": writing_count,
         "speaking_count": speaking_count
     }
-    return templates.TemplateResponse(request, "profile.html", {"user": user_info})
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user_info})
 
 
 class AIHelperRequest(BaseModel):
     text_content: str
     module_type: str
-
 
 @app.post("/api/ai-helper")
 async def ai_helper(req: AIHelperRequest):
