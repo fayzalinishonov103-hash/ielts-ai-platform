@@ -159,13 +159,13 @@ async def register_page(request: Request):
 
 @app.post("/register")
 async def register_user(
-    name: str = Form(...),
-    username: str = Form(...),
-    password: str = Form(...),
-    university: str = Form(None),
-    birth_date: str = Form(...),
-    address: str = Form(...),
-    level: str = Form(...)
+        name: str = Form(...),
+        username: str = Form(...),
+        password: str = Form(...),
+        birth_date: str = Form(...),
+        address: str = Form(...),
+        university: Optional[str] = Form(None),
+        level: str = Form(...)
 ):
     try:
         uni_value = university if university and university.strip() != "" else "Andijan State Technical University"
@@ -175,11 +175,13 @@ async def register_user(
         conn = sqlite3.connect("cefr_database.db")
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO users (name, username, password, university, faculty, specialty, birth_date, address, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            """INSERT INTO users (name, username, password, university, faculty, specialty, birth_date, address, level)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (name, username, password, uni_value, faculty_val, specialty_val, birth_date, address, level)
         )
         conn.commit()
         conn.close()
+
         return HTMLResponse(content="""
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
@@ -196,6 +198,40 @@ async def register_user(
                 });
             </script>
         """)
+    except sqlite3.IntegrityError:
+        return HTMLResponse(content="""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    title: 'Xatolik!',
+                    text: 'Bu username allaqachon band!',
+                    icon: 'error',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444',
+                    confirmButtonText: 'Qaytadan urinish'
+                }).then(() => {
+                    window.history.back();
+                });
+            </script>
+        """)
+    except Exception as e:
+        return HTMLResponse(content=f"""
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({{
+                    title: 'Xatolik!',
+                    text: 'Tizimda xatolik yuz berdi: {str(e)}',
+                    icon: 'error',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444'
+                }}).then(() => {{
+                    window.history.back();
+                }});
+            </script>
+        """)
+
     except sqlite3.IntegrityError:
         return HTMLResponse(content="""
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
