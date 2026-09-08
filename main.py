@@ -213,7 +213,7 @@ async def login_page(request: Request):
 
 
 @app.post("/login")
-async def login_user(username: str = Form(...), password: str = Form(...)):
+async def login_user(response: Response, username: str = Form(...), password: str = Form(...)):
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -223,6 +223,8 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
 
     if user:
         user_name = user['name']
+
+        # Cookie'ni to'g'ridan-to'g'ri response obyektiga yozamiz
         resp = HTMLResponse(content=f"""
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
@@ -239,7 +241,7 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
                 }});
             </script>
         """)
-        resp.set_cookie(key="username", value=user["username"])
+        resp.set_cookie(key="username", value=user["username"], httponly=True)
         return resp
     else:
         return HTMLResponse(content="""
