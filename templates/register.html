@@ -65,4 +65,18 @@
         Hisobingiz bormi? <a href="/login" class="text-emerald-400 font-semibold hover:underline">Kirish</a>
     </p>
 </div>
+<script>
+    const birthInput = document.querySelector('input[name="birth_date"]');
+    if (birthInput) {
+        birthInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); // Faqat raqamlarni olib qolamiz
+            if (value.length > 2 && value.length <= 4) {
+                value = value.slice(0, 2) + '.' + value.slice(2);
+            } else if (value.length > 4) {
+                value = value.slice(0, 2) + '.' + value.slice(2, 4) + '.' + value.slice(4, 8);
+            }
+            e.target.value = value;
+        });
+    }
+</script>
 {% endblock %}
