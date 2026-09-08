@@ -382,26 +382,18 @@ async def add_reading_ai(title: str = Form(...), passage_text: str = Form(...), 
 
 @app.get("/reading", response_class=HTMLResponse)
 async def reading_page(request: Request):
-    username = request.cookies.get("username")
-    user_level = "B2"  # Standart daraja
-
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    if username:
-        cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
-        user_row = cursor.fetchone()
-        if user_row and "level" in user_row.keys():
-            user_level = user_row["level"]
-
-    cursor.execute("SELECT * FROM readings WHERE level = ?", (user_level,))
+    # Darajani tekshirmasdan barcha readings matnlarini olib kelamiz
+    cursor.execute("SELECT * FROM readings")
     items = cursor.fetchall()
     conn.close()
 
     return templates.TemplateResponse(
         "reading.html",
-        {"request": request, "items": items, "user_level": user_level}
+        {"request": request, "items": items, "user_level": "B2"}
     )
 
 
