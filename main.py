@@ -385,13 +385,21 @@ async def reading_page(request: Request, username: str = Depends(get_current_use
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+
+    # Foydalanuvchi darajasini olish
     cursor.execute("SELECT level FROM users WHERE username = ?", (username,))
     user_row = cursor.fetchone()
     user_level = user_row["level"] if user_row else "B2"
-    cursor.execute("SELECT * FROM reading WHERE level = ?", (user_level,))
+
+    # Bazadagi jadval nomi 'readings' ekanligiga e'tibor bering
+    cursor.execute("SELECT * FROM readings WHERE level = ?", (user_level,))
     items = cursor.fetchall()
     conn.close()
-    return templates.TemplateResponse(request, "reading.html", {"items": items, "user_level": user_level})
+
+    return templates.TemplateResponse(
+        "reading.html",
+        {"request": request, "items": items, "user_level": user_level}
+    )
 
 
 @app.get("/reading/{item_id}", response_class=HTMLResponse)
@@ -399,13 +407,17 @@ async def reading_detail(request: Request, item_id: int, username: str = Depends
     conn = sqlite3.connect("cefr_database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM reading WHERE id = ?", (item_id,))
+    cursor.execute("SELECT * FROM readings WHERE id = ?", (item_id,))
     item = cursor.fetchone()
     conn.close()
+
     if not item:
         raise HTTPException(status_code=404, detail="Topilmadi")
-    return templates.TemplateResponse(request, "reading_detail.html", {"item": item})
 
+    return templates.TemplateResponse(
+        "reading_detail.html",
+        {"request": request, "item": item}
+    )
 
 class ReadingCheckRequest(BaseModel):
     item_id: int
