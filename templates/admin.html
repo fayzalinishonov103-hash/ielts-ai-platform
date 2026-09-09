@@ -2,155 +2,231 @@
 {% block content %}
 <div class="space-y-8 max-w-6xl mx-auto pb-12">
     <!-- Yuqori qism va navigatsiya -->
-    <div class="border-b border-gray-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="border-b border-stone-300/80 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h2 class="text-3xl font-black text-white">Admin Panel</h2>
-            <p class="text-gray-400 mt-1">Platforma kontentlari, foydalanuvchilar va tizim sozlamalarini boshqarish.</p>
+            <h2 class="text-3xl font-black text-stone-900 tracking-tight">Admin Panel</h2>
+            <p class="text-stone-600 mt-1 text-sm">Platforma kontentlari, foydalanuvchilar va tizim sozlamalarini boshqarish.</p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="/admin/users" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20">Foydalanuvchilar</a>
-            <a href="/admin/analytics" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition shadow-lg shadow-purple-600/20">Statistika</a>
-            <a href="/admin/settings" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition">Sozlamalar</a>
+            <a href="/admin" class="bg-stone-200/80 hover:bg-stone-300 text-stone-800 font-semibold px-4 py-2 rounded-2xl text-sm transition">Bosh sahifa</a>
+            <a href="/admin/users" class="bg-stone-900 hover:bg-stone-800 text-white font-semibold px-4 py-2 rounded-2xl text-sm transition shadow-sm">Foydalanuvchilar</a>
+            <a href="/admin/analytics" class="bg-amber-700 hover:bg-amber-800 text-white font-semibold px-4 py-2 rounded-2xl text-sm transition shadow-sm">Statistika</a>
+            <a href="/admin/settings" class="bg-stone-200/80 hover:bg-stone-300 text-stone-800 font-semibold px-4 py-2 rounded-2xl text-sm transition">Sozlamalar</a>
         </div>
     </div>
 
+    <!-- AGAR FOYDALANUVCHILAR BO'LIMI OCHILgan BO'LSA -->
+    {% if active_tab == 'users' %}
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 shadow-xl">
+        <h3 class="text-xl font-black text-stone-900 mb-6">Ro'yxatdan o'tgan foydalanuvchilar</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-stone-700">
+                <thead>
+                    <tr class="border-b border-stone-300/60 text-stone-400 text-xs uppercase tracking-wider">
+                        <th class="pb-3">Ism</th>
+                        <th class="pb-3">Username</th>
+                        <th class="pb-3">Universitet / Fakultet</th>
+                        <th class="pb-3">Daraja</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-200/60 text-sm">
+                    {% for u in users %}
+                    <tr>
+                        <td class="py-3.5 font-bold text-stone-900">{{ u.name }}</td>
+                        <td class="py-3.5 text-amber-700 font-medium">@{{ u.username }}</td>
+                        <td class="py-3.5 text-stone-600">{{ u.university }} / {{ u.faculty }}</td>
+                        <td class="py-3.5"><span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg text-xs font-bold">{{ u.level }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- AGAR STATISTIKA OCHILgan BO'LSA -->
+    {% elif active_tab == 'analytics' %}
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 shadow-xl text-stone-900">
+        <h3 class="text-xl font-black mb-6">Tizim Statistikasi va Tahlili</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-5 bg-white/80 rounded-2xl border border-stone-200 shadow-sm">
+                <p class="text-stone-500 text-xs font-bold uppercase tracking-wider">Jami foydalanuvchilar</p>
+                <p class="text-3xl font-black mt-2 text-stone-900">{{ stats.users }} ta</p>
+            </div>
+            <div class="p-5 bg-white/80 rounded-2xl border border-stone-200 shadow-sm">
+                <p class="text-stone-500 text-xs font-bold uppercase tracking-wider">Jami Reading testlar</p>
+                <p class="text-3xl font-black mt-2 text-amber-700">{{ stats.reading }} ta</p>
+            </div>
+            <div class="p-5 bg-white/80 rounded-2xl border border-stone-200 shadow-sm">
+                <p class="text-stone-500 text-xs font-bold uppercase tracking-wider">Jami Listening testlar</p>
+                <p class="text-3xl font-black mt-2 text-amber-700">{{ stats.listening }} ta</p>
+            </div>
+            <div class="p-5 bg-white/80 rounded-2xl border border-stone-200 shadow-sm">
+                <p class="text-stone-500 text-xs font-bold uppercase tracking-wider">Jami Writing va Speaking mavzular</p>
+                <p class="text-3xl font-black mt-2 text-stone-900">{{ stats.writing + stats.speaking }} ta</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AGAR SOZLAMALAR OCHILgan BO'LSA -->
+    {% elif active_tab == 'settings' %}
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 shadow-xl text-stone-900">
+        <h3 class="text-xl font-black mb-4">Tizim Sozlamalari</h3>
+        <p class="text-stone-600 text-sm">Bu yerda admin sozlamalari joylashadi.</p>
+    </div>
+
+    <!-- AKS HOLDA (ODDIY BOSH SAHIFA / DASHBOARD) -->
+    {% else %}
     <!-- Tezkor Statistika Kartochkalari -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-gray-900/80 border border-gray-800 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-5 rounded-3xl shadow-xl flex items-center justify-between">
             <div>
-                <p class="text-xs font-semibold text-gray-400 uppercase">Jami foydalanuvchilar</p>
-                <h4 class="text-2xl font-black text-white mt-1">{{ total_users | default(0) }}</h4>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Jami foydalanuvchilar</p>
+                <h4 class="text-2xl font-black text-stone-900 mt-1">{{ total_users | default(0) }}</h4>
             </div>
-            <div class="bg-indigo-500/10 text-indigo-400 p-3 rounded-xl">
+            <div class="bg-stone-200/80 text-stone-800 p-3 rounded-2xl">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
         </div>
-        <div class="bg-gray-900/80 border border-gray-800 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-5 rounded-3xl shadow-xl flex items-center justify-between">
             <div>
-                <p class="text-xs font-semibold text-gray-400 uppercase">Reading testlar</p>
-                <h4 class="text-2xl font-black text-white mt-1">{{ total_readings | default(0) }}</h4>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Reading testlar</p>
+                <h4 class="text-2xl font-black text-stone-900 mt-1">{{ total_readings | default(0) }}</h4>
             </div>
-            <div class="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl">
+            <div class="bg-stone-200/80 text-stone-800 p-3 rounded-2xl">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             </div>
         </div>
-        <div class="bg-gray-900/80 border border-gray-800 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-5 rounded-3xl shadow-xl flex items-center justify-between">
             <div>
-                <p class="text-xs font-semibold text-gray-400 uppercase">Listening testlar</p>
-                <h4 class="text-2xl font-black text-white mt-1">{{ total_listenings | default(0) }}</h4>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Listening testlar</p>
+                <h4 class="text-2xl font-black text-stone-900 mt-1">{{ total_listenings | default(0) }}</h4>
             </div>
-            <div class="bg-blue-500/10 text-blue-400 p-3 rounded-xl">
+            <div class="bg-stone-200/80 text-stone-800 p-3 rounded-2xl">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg>
             </div>
         </div>
-        <div class="bg-gray-900/80 border border-gray-800 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-5 rounded-3xl shadow-xl flex items-center justify-between">
             <div>
-                <p class="text-xs font-semibold text-gray-400 uppercase">Writing/Speaking</p>
-                <h4 class="text-2xl font-black text-white mt-1">{{ (total_writings | default(0)) + (total_speakings | default(0)) }}</h4>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Writing/Speaking</p>
+                <h4 class="text-2xl font-black text-stone-900 mt-1">{{ (total_writings | default(0)) + (total_speakings | default(0)) }}</h4>
             </div>
-            <div class="bg-amber-500/10 text-amber-400 p-3 rounded-xl">
+            <div class="bg-stone-200/80 text-stone-800 p-3 rounded-2xl">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
             </div>
         </div>
     </div>
 
     <!-- Asosiy Kontent Qo'shish Grid Formats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
         <!-- 1. Reading qo'shish -->
-        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
-            <h3 class="text-xl font-bold text-white mb-4">Reading Matni (AI orqali)</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 shadow-xl">
+            <h3 class="text-xl font-black text-stone-900 mb-6">Reading Matni (AI orqali)</h3>
             <form action="/admin/add-reading-ai" method="POST" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Sarlavha (Title)</label>
-                    <input type="text" name="title" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1">Sarlavha (Title)</label>
+                    <input type="text" name="title" required class="w-full bg-white border border-stone-300 rounded-2xl px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Passage Text</label>
-                    <textarea name="passage_text" rows="4" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"></textarea>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1">Passage Text</label>
+                    <textarea name="passage_text" rows="4" required class="w-full bg-white border border-stone-300 rounded-2xl px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 text-sm"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
-                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
-                        <option value="A2">A2</option>
-                        <option value="B1">B1</option>
-                        <option value="B2" selected>B2</option>
-                        <option value="C1">C1</option>
-                    </select>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Daraja (CEFR Level)</label>
+                    <div class="grid grid-cols-6 gap-1.5">
+                        {% for lvl in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] %}
+                        <button type="button" onclick="setLevel('reading_level', '{{ lvl }}', this)" class="lvl-btn-reading {% if lvl == 'B2' %}bg-amber-700 border-amber-700 text-white{% else %}bg-white border-stone-300 text-stone-700{% endif %} border rounded-xl py-2 text-xs font-bold hover:border-amber-700 transition">{{ lvl }}</button>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="level" id="reading_level" value="B2">
                 </div>
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">AI orqali qo'shish</button>
+                <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-3.5 rounded-2xl transition shadow-md text-sm mt-2">AI orqali qo'shish</button>
             </form>
         </div>
 
         <!-- 2. Listening qo'shish -->
-        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
-            <h3 class="text-xl font-bold text-white mb-4">Listening Matni (AI orqali)</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 shadow-xl">
+            <h3 class="text-xl font-black text-stone-900 mb-6">Listening Matni (AI orqali)</h3>
             <form action="/admin/add-listening-ai" method="POST" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Sarlavha (Title)</label>
-                    <input type="text" name="title" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1">Sarlavha (Title)</label>
+                    <input type="text" name="title" required class="w-full bg-white border border-stone-300 rounded-2xl px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Audio Text</label>
-                    <textarea name="audio_text" rows="4" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"></textarea>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1">Audio Text</label>
+                    <textarea name="audio_text" rows="4" required class="w-full bg-white border border-stone-300 rounded-2xl px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 text-sm"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
-                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
-                        <option value="A2">A2</option>
-                        <option value="B1">B1</option>
-                        <option value="B2" selected>B2</option>
-                        <option value="C1">C1</option>
-                    </select>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Daraja (CEFR Level)</label>
+                    <div class="grid grid-cols-6 gap-1.5">
+                        {% for lvl in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] %}
+                        <button type="button" onclick="setLevel('listening_level', '{{ lvl }}', this)" class="lvl-btn-listening {% if lvl == 'B2' %}bg-amber-700 border-amber-700 text-white{% else %}bg-white border-stone-300 text-stone-700{% endif %} border rounded-xl py-2 text-xs font-bold hover:border-amber-700 transition">{{ lvl }}</button>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="level" id="listening_level" value="B2">
                 </div>
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">AI orqali qo'shish</button>
+                <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-3.5 rounded-2xl transition shadow-md text-sm mt-2">AI orqali qo'shish</button>
             </form>
         </div>
 
         <!-- 3. Writing mavzusi qo'shish -->
-        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
-            <h3 class="text-xl font-bold text-white mb-4">Writing Mavzusi (AI orqali)</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 shadow-xl">
+            <h3 class="text-xl font-black text-stone-900 mb-6">Writing Mavzusi (AI orqali)</h3>
             <form action="/admin/add-writing-ai" method="POST" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Mavzu Sarlavhasi (Title)</label>
-                    <input type="text" name="title" placeholder="Masalan: The impact of modern technology" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1">Mavzu Sarlavhasi (Title)</label>
+                    <input type="text" name="title" placeholder="Masalan: The impact of modern technology" required class="w-full bg-white border border-stone-300 rounded-2xl px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
-                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
-                        <option value="A2">A2</option>
-                        <option value="B1">B1</option>
-                        <option value="B2" selected>B2</option>
-                        <option value="C1">C1</option>
-                    </select>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Daraja (CEFR Level)</label>
+                    <div class="grid grid-cols-6 gap-1.5">
+                        {% for lvl in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] %}
+                        <button type="button" onclick="setLevel('writing_level', '{{ lvl }}', this)" class="lvl-btn-writing {% if lvl == 'B2' %}bg-amber-700 border-amber-700 text-white{% else %}bg-white border-stone-300 text-stone-700{% endif %} border rounded-xl py-2 text-xs font-bold hover:border-amber-700 transition">{{ lvl }}</button>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="level" id="writing_level" value="B2">
                 </div>
                 <div class="pt-2">
-                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">AI orqali qo'shish</button>
+                    <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-3.5 rounded-2xl transition shadow-md text-sm">AI orqali qo'shish</button>
                 </div>
             </form>
         </div>
 
         <!-- 4. Speaking mavzusi qo'shish -->
-        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl">
-            <h3 class="text-xl font-bold text-white mb-4">Speaking Mavzusi</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 shadow-xl">
+            <h3 class="text-xl font-black text-stone-900 mb-6">Speaking Mavzusi</h3>
             <form action="/admin/add-speaking-topic" method="POST" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Mavzu sarlavhasi</label>
-                    <input type="text" name="title" placeholder="Masalan: Describe your favorite book" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-1">Mavzu sarlavhasi</label>
+                    <input type="text" name="title" placeholder="Masalan: Describe your favorite book" required class="w-full bg-white border border-stone-300 rounded-2xl px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-1">Daraja (CEFR Level)</label>
-                    <select name="level" required class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
-                        <option value="A2">A2</option>
-                        <option value="B1">B1</option>
-                        <option value="B2" selected>B2</option>
-                        <option value="C1">C1</option>
-                    </select>
+                    <label class="block text-xs font-bold text-stone-500 uppercase mb-2">Daraja (CEFR Level)</label>
+                    <div class="grid grid-cols-6 gap-1.5">
+                        {% for lvl in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] %}
+                        <button type="button" onclick="setLevel('speaking_level', '{{ lvl }}', this)" class="lvl-btn-speaking {% if lvl == 'B2' %}bg-amber-700 border-amber-700 text-white{% else %}bg-white border-stone-300 text-stone-700{% endif %} border rounded-xl py-2 text-xs font-bold hover:border-amber-700 transition">{{ lvl }}</button>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="level" id="speaking_level" value="B2">
                 </div>
                 <div class="pt-2">
-                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/10">Mavzu qo'shish</button>
+                    <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-3.5 rounded-2xl transition shadow-md text-sm">Mavzu qo'shish</button>
                 </div>
             </form>
         </div>
     </div>
+    {% endif %}
 </div>
+
+<script>
+    function setLevel(inputId, level, btn) {
+        const container = btn.parentElement;
+        container.querySelectorAll('button').forEach(b => {
+            b.classList.remove('bg-amber-700', 'border-amber-700', 'text-white');
+            b.classList.add('bg-white', 'border-stone-300', 'text-stone-700');
+        });
+        btn.classList.remove('bg-white', 'border-stone-300', 'text-stone-700');
+        btn.classList.add('bg-amber-700', 'border-amber-700', 'text-white');
+        document.getElementById(inputId).value = level;
+    }
+</script>
 {% endblock %}

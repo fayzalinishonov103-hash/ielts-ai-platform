@@ -1,42 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-3xl mx-auto space-y-6">
+<div class="max-w-3xl mx-auto space-y-6 pb-12">
     <!-- Yuqori qism / Orqaga qaytish -->
-    <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-        <a href="/reading" class="text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition">&larr; Reading ro'yxatiga qaytish</a>
-        <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Reading Item {{ item.id }}</span>
+    <div class="flex justify-between items-center border-b border-stone-300/80 pb-4">
+        <a href="/reading" class="text-amber-700 hover:text-amber-800 text-sm font-semibold transition">&larr; Reading ro'yxatiga qaytish</a>
+        <span class="text-xs font-bold px-3 py-1 rounded-xl bg-amber-100 text-amber-800 border border-amber-200">Reading Item {{ item.id }}</span>
     </div>
 
-    <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-8 rounded-2xl shadow-2xl space-y-6">
-        <h1 class="text-2xl font-black text-white">{{ item.title }}</h1>
-        
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 md:p-8 rounded-3xl shadow-xl space-y-6">
+        <h1 class="text-2xl font-black text-stone-900">{{ item.title }}</h1>
+
         <!-- Matn -->
-        <div id="passage-content" class="bg-slate-950 p-6 rounded-xl border border-gray-800 leading-relaxed text-gray-300 text-sm">
+        <div id="passage-content" class="bg-white p-6 rounded-2xl border border-stone-300/80 leading-relaxed text-stone-700 text-sm shadow-sm">
             {{ item.passage_text }}
         </div>
 
         <!-- AI Rejimi tugmasi -->
         <div>
-            <button onclick="loadAIHelper('reading')" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2 text-sm shadow-lg shadow-emerald-600/20">
+            <button onclick="loadAIHelper('reading')" class="bg-stone-900 hover:bg-stone-800 text-white font-bold px-5 py-3 rounded-2xl transition flex items-center gap-2 text-sm shadow-md">
                 🤖 AI Rejimi (Kalit so'zlar va Maslahatlar)
             </button>
-            <div id="ai-helper-box" class="hidden mt-4 p-5 bg-slate-950 border border-emerald-500/30 rounded-xl text-gray-300 space-y-3">
-                <h4 class="text-emerald-400 font-bold text-xs uppercase tracking-wider">AI Yordamchisi Tavsiyalari:</h4>
-                <div id="ai-helper-content" class="whitespace-pre-line leading-relaxed text-xs text-gray-300"></div>
+            <div id="ai-helper-box" class="hidden mt-4 p-5 bg-white border border-amber-700/30 rounded-2xl text-stone-700 space-y-3 shadow-sm">
+                <h4 class="text-amber-800 font-bold text-xs uppercase tracking-wider">AI Yordamchisi Tavsiyalari:</h4>
+                <div id="ai-helper-content" class="whitespace-pre-line leading-relaxed text-xs text-stone-600"></div>
             </div>
         </div>
 
         <!-- Savol va Javob kiritish -->
-        <div class="space-y-3 pt-4 border-t border-gray-800">
-            <label class="block font-bold text-gray-200 text-sm">Savol: {{ item.question }}</label>
-            <input type="text" id="user-answer" placeholder="Javobingizni yozing..." class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 transition">
+        <div class="space-y-3 pt-4 border-t border-stone-300/60">
+            <label class="block font-bold text-stone-900 text-sm">Savol: {{ item.question }}</label>
+            <input type="text" id="user-answer" placeholder="Javobingizni yozing..." class="w-full bg-white border border-stone-300 rounded-2xl px-4 py-3 text-stone-900 text-sm focus:outline-none focus:border-amber-700 transition">
         </div>
 
         <div class="flex flex-wrap gap-4 items-center pt-2">
-            <button onclick="checkUserAnswer()" id="check-btn" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-6 py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-emerald-500/20">
+            <button onclick="checkUserAnswer()" id="check-btn" class="bg-stone-900 hover:bg-stone-800 text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-md">
                 Javobni tekshirish
             </button>
-            <button onclick="toggleCorrectAnswer()" class="text-gray-400 hover:text-white text-xs underline transition">
+            <button onclick="toggleCorrectAnswer()" class="text-stone-500 hover:text-stone-900 text-xs font-semibold underline transition">
                 To'g'ri javobni ko'rish
             </button>
         </div>
@@ -45,8 +45,8 @@
         <div id="result-feedback" class="hidden mt-4"></div>
 
         <!-- Yashirin to'g'ri javob -->
-        <div id="correct-answer-box" class="hidden mt-4 p-4 bg-slate-950 border border-gray-800 rounded-xl text-xs text-gray-400">
-            To'g'ri javob: <span class="text-emerald-400 font-bold">{{ item.correct_answer }}</span>
+        <div id="correct-answer-box" class="hidden mt-4 p-4 bg-white border border-stone-300 rounded-2xl text-xs text-stone-600 shadow-sm">
+            To'g'ri javob: <span class="text-amber-800 font-bold">{{ item.correct_answer }}</span>
         </div>
     </div>
 </div>
@@ -56,15 +56,15 @@ async function checkUserAnswer() {
     const userVal = document.getElementById('user-answer').value.trim();
     const feedbackDiv = document.getElementById('result-feedback');
     const itemId = {{ item.id }};
-    
+
     feedbackDiv.classList.remove('hidden');
     if(userVal === "") {
-        feedbackDiv.className = "mt-3 p-4 rounded-xl text-xs font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
+        feedbackDiv.className = "mt-3 p-4 rounded-2xl text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-sm";
         feedbackDiv.innerText = "Iltimos, avval javob yozing!";
         return;
     }
-    
-    feedbackDiv.className = "mt-3 p-4 rounded-xl text-xs font-bold bg-gray-800 text-gray-300 border border-gray-700";
+
+    feedbackDiv.className = "mt-3 p-4 rounded-2xl text-xs font-bold bg-white text-stone-700 border border-stone-300 shadow-sm";
     feedbackDiv.innerText = "AI javobingizni tahlil qilmoqda...";
 
     try {
@@ -74,13 +74,13 @@ async function checkUserAnswer() {
             body: JSON.stringify({ item_id: itemId, user_answer: userVal })
         });
         const data = await response.json();
-        
+
         if (response.ok) {
             if (data.is_correct) {
-                feedbackDiv.className = "mt-3 p-4 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                feedbackDiv.className = "mt-3 p-4 rounded-2xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-sm";
                 feedbackDiv.innerText = "Ajoyib! Javobingiz to'g'ri 🎉";
             } else {
-                feedbackDiv.className = "mt-3 p-4 rounded-xl text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20";
+                feedbackDiv.className = "mt-3 p-4 rounded-2xl text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200 shadow-sm";
                 feedbackDiv.innerText = "Afsuski, javob noto'g'ri. Qayta urinib ko'ring.";
             }
         } else {

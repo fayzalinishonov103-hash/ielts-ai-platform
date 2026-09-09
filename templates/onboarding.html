@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darajani Aniqlash — CEFR AI Platform</title>
+
+    <!-- Montserrat Shrifti -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FAF8F5;
+            color: #1c1917;
+        }
+        /* Kreativ Dot Pattern fon */
+        .bg-pattern {
+            background-image: radial-gradient(#d6d3d1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        /* Savol qadamlarini boshqarish uchun */
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-6 selection:bg-amber-700 selection:text-white bg-pattern">
+
+    <!-- Top Bar -->
+    <header class="max-w-3xl w-full mx-auto flex items-center justify-between py-4 bg-white/80 backdrop-blur-md px-6 rounded-2xl border border-stone-200/60 shadow-sm">
+        <a href="/" class="flex items-center gap-2.5">
+            <div class="bg-stone-900 text-white p-2.5 rounded-xl font-black text-sm shadow-md">AI</div>
+            <span class="font-black tracking-tight text-xl text-stone-900">CEFR Platform</span>
+        </a>
+        <div id="progress-text" class="text-xs font-bold text-stone-500 bg-stone-100 px-3 py-1.5 rounded-full">
+            1 / 5 - qadam
+        </div>
+    </header>
+
+    <!-- Main Form Card Container -->
+    <main class="max-w-3xl w-full mx-auto my-auto py-8">
+        <div class="bg-white border border-stone-300/80 rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-100/50 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- QADAM 1: Hozirgi daraja -->
+            <div class="step-content active" data-step="1">
+                <span class="inline-block bg-amber-100 text-amber-900 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-4 w-max">
+                    1-savol
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-2 text-stone-900">
+                    Hozirgi ingliz tili darajangiz qanday?
+                </h2>
+                <p class="text-stone-500 text-sm mb-6">O'zingizga mos bo'lgan eng yaqin darajani tanlang.</p>
+
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q1" value="A1-A2" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🟡 Boshlang'ich (A1–A2)</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q1" value="B1" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🟢 O'rta (B1)</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q1" value="B2" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🔵 Yuqori o'rta (B2)</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q1" value="C1-C2" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🟣 Professional (C1–C2)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- QADAM 2: Asosiy maqsad -->
+            <div class="step-content" data-step="2">
+                <span class="inline-block bg-amber-100 text-amber-900 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-4 w-max">
+                    2-savol
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-2 text-stone-900">
+                    CEFR imtihonini topshirishdan asosiy maqsadingiz nima?
+                </h2>
+                <p class="text-stone-500 text-sm mb-6">Sizga eng mos keluvchi variantni belgilang.</p>
+
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q2" value="University" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🎓 Universitetga kirish yoki magistratura uchun</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q2" value="Job" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">💼 Ishga joylashish yoki chet elga ketish</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q2" value="Personal" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">📜 O'z bilimimni sinab ko'rish va sertifikat olish</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- QADAM 3: Asosiy qiyinchilik -->
+            <div class="step-content" data-step="3">
+                <span class="inline-block bg-amber-100 text-amber-900 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-4 w-max">
+                    3-savol
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-2 text-stone-900">
+                    Imtihonni topshirishingizga nima to'sqinlik qilmoqda?
+                </h2>
+                <p class="text-stone-500 text-sm mb-6">Asosiy qiyinchilik nimada?</p>
+
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q3" value="NoChecker" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🗣️ Writing va Speaking qismlarini tekshiradigan odam yo'q</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q3" value="NoTime" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">⏳ Doimiy shug'ullanishga vaqt yoki tartib yetishmaydi</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q3" value="Fear" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🎯 Imtihondan yiqilishdan qo'rqish / xatolarimni bilmayman</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- QADAM 4: Ko'nikma -->
+            <div class="step-content" data-step="4">
+                <span class="inline-block bg-amber-100 text-amber-900 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-4 w-max">
+                    4-savol
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-2 text-stone-900">
+                    Qaysi ko'nikmani rivojlantirishga ko'proq e'tibor qaratasiz?
+                </h2>
+                <p class="text-stone-500 text-sm mb-6">Ko'proq oqsoqlanayotgan qismni tanlang.</p>
+
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q4" value="Listening" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🎧 Listening (Eshitib tushunish)</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q4" value="Reading" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">📖 Reading (O'qish va tushunish)</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q4" value="Writing" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">✍️ Writing (Insho va matn yozish)</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q4" value="Speaking" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🗣️ Speaking (Erkin gaplashish)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- QADAM 5: Vaqt -->
+            <div class="step-content" data-step="5">
+                <span class="inline-block bg-amber-100 text-amber-900 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-4 w-max">
+                    5-savol
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-2 text-stone-900">
+                    Imtihonga tayyorlanish uchun qancha vaqtingiz bor?
+                </h2>
+                <p class="text-stone-500 text-sm mb-6">Sizdagi mavjud muddatni ko'rsating.</p>
+
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q5" value="LessThanMonth" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">⚡ 1 oydan kam</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q5" value="1-3Months" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">📅 1-3 oy</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q5" value="3-6Months" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🗓️ 3-6 oy</span>
+                    </label>
+                    <label class="flex items-center gap-4 p-4 rounded-2xl border-2 border-stone-200 hover:border-amber-700 cursor-pointer transition bg-stone-50/50">
+                        <input type="radio" name="q5" value="NoRush" class="w-4 h-4 text-amber-700 focus:ring-amber-600">
+                        <span class="font-bold text-stone-800 text-sm sm:text-base">🚀 Shoshilmayapman, o'zim uchun o'rganaman</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Navigatsiya Tugmalari (Orqaga / Oldinga) -->
+            <div class="flex items-center justify-between pt-6 border-t border-stone-200">
+                <button id="prev-btn" onclick="prevStep()" class="text-xs font-bold text-stone-500 hover:text-stone-900 transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                    &larr; Orqaga
+                </button>
+                <button id="next-btn" onclick="nextStep()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-3.5 px-8 rounded-2xl transition shadow-lg shadow-amber-900/20 text-sm flex items-center gap-2">
+                    <span>Keyingisi</span>
+                    <span>&rarr;</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-3xl w-full mx-auto text-center text-xs text-stone-400 py-4 border-t border-stone-200/60">
+        CEFR AI Platformasi &copy; 2026
+    </footer>
+
+    <!-- JavaScript - Savollararo o'tish logikasi -->
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function updateStepView() {
+            // Qadamlarni ko'rsatish/yashirish
+            document.querySelectorAll('.step-content').forEach(el => {
+                el.classList.remove('active');
+                if(el.getAttribute('data-step') == currentStep) {
+                    el.classList.add('active');
+                }
+            });
+
+            // Tepadagi progress yozuvi
+            document.getElementById('progress-text').innerText = `${currentStep} / ${totalSteps} - qadam`;
+
+            // Orqaga tugmasini boshqarish
+            const prevBtn = document.getElementById('prev-btn');
+            if(currentStep === 1) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // Keyingisi / Tayyor rejani ko'rish tugmasi matnini o'zgartirish
+            const nextBtn = document.getElementById('next-btn');
+            if(currentStep === totalSteps) {
+                nextBtn.innerHTML = `<span>Tayyor rejani ko'rish</span> <span>&rarr;</span>`;
+            } else {
+                nextBtn.innerHTML = `<span>Keyingisi</span> <span>&rarr;</span>`;
+            }
+        }
+
+        function nextStep() {
+            if(currentStep < totalSteps) {
+                currentStep++;
+                updateStepView();
+            } else {
+                // Oxirgi qadamda tugma bosilganda natijalar sahifasiga o'tish (yoki ai tahlilga yo'naltirish)
+                window.location.href = "/profile"; // yoki profilingizdagi sahifa
+            }
+        }
+
+        function prevStep() {
+            if(currentStep > 1) {
+                currentStep--;
+                updateStepView();
+            }
+        }
+    </script>
+</body>
+</html>

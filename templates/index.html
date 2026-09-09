@@ -1,28 +1,151 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="relative min-h-[75vh] flex items-center justify-center">
-    <!-- Orqa fondagi yorqin nurli bezaklar (Glassmorphism muhitini ochib berish uchun) -->
-    <div class="absolute -top-10 -left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-10 -right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEFR AI — Sun'iy Intellekt Platformasi</title>
 
-    <!-- Asosiy shisha blok -->
-    <div class="relative z-10 text-center py-16 px-8 space-y-8 max-w-2xl mx-auto bg-gray-900/40 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl">
-        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
-            Sun'iy intellekt yordamida <span class="text-emerald-400">CEFR</span> darajangizni oshiring
-        </h1>
+    <!-- Montserrat Shrifti -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 
-        <p class="text-gray-300 text-sm md:text-base leading-relaxed">
-            Reading, Listening, Writing va Speaking ko'nikmalaringizni zamonaviy AI vositalari orqali mutlaqo avtomatlashtirilgan tarzda mashq qiling va tahlil oling.
-        </p>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        <div class="flex flex-wrap justify-center gap-4 pt-2">
-            <a href="/reading" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-7 py-3.5 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20 transform hover:-translate-y-0.5">
-                Mashqni Boshlash
-            </a>
-            <a href="/admin" class="bg-gray-800/80 hover:bg-gray-700/80 backdrop-blur-md border border-white/10 text-white font-bold px-7 py-3.5 rounded-xl text-sm transition transform hover:-translate-y-0.5">
-                Admin Panel
-            </a>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FAF8F5;
+            color: #1c1917;
+        }
+        /* Kreativ Dot Pattern fon */
+        .bg-pattern {
+            background-image: radial-gradient(#d6d3d1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        /* Rasm slayderi uchun o'tish effekti */
+        .slider-img {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .slider-img.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-6 selection:bg-amber-700 selection:text-white bg-pattern">
+
+    <!-- Top Bar (Minimal va toza) -->
+    <header class="max-w-6xl w-full mx-auto flex items-center justify-between py-4 bg-white/80 backdrop-blur-md px-6 rounded-2xl border border-stone-200/60 shadow-sm">
+        <a href="/" class="flex items-center gap-2.5">
+            <div class="bg-stone-900 text-white p-2.5 rounded-xl font-black text-sm shadow-md">AI</div>
+            <span class="font-black tracking-tight text-xl text-stone-900">CEFR Platform</span>
+        </a>
+
+        <div class="flex items-center gap-3">
+            <a href="/login" class="text-xs font-bold text-stone-600 hover:text-stone-900 px-4 py-2.5 transition">Kirish</a>
+            <a href="/register" class="bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-md shadow-stone-900/10">Ro'yxatdan o'tish</a>
         </div>
-    </div>
-</div>
-{% endblock %}
+    </header>
+
+    <!-- Main Bento Grid Hero Section -->
+    <main class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto py-8">
+
+        <!-- Chap Katta Karta -->
+        <div class="lg:col-span-7 bg-white border border-stone-300/80 rounded-3xl p-8 sm:p-12 shadow-xl flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-100/50 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div>
+                <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-900 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-6">
+                    <span class="w-2 h-2 rounded-full bg-amber-700 animate-pulse"></span>
+                    AI-Powered CEFR Platform
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-4 text-stone-900 leading-[1.1]">
+                    Sun'iy intellekt yordamida <span class="text-amber-700">CEFR</span> darajangizni oshiring
+                </h1>
+
+                <p class="text-stone-600 text-sm sm:text-base mb-8 leading-relaxed">
+                    Reading, Listening, Writing va Speaking ko'nikmalaringizni zamonaviy AI vositalari orqali mutlaqo avtomatlashtirilgan tarzda mashq qiling va professional tahlil oling.
+                </p>
+            </div>
+
+            <!-- Bitta katta Darajani Aniqlash tugmasi (Faqat chap kartada qoldi) -->
+            <div>
+                <a href="/onboarding" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold text-center py-4 px-6 rounded-2xl transition shadow-lg shadow-amber-900/20 text-sm flex items-center justify-center gap-2 group">
+                    <span>Darajani Aniqlash</span>
+                    <span class="group-hover:translate-x-1 transition">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- O'ng Kreativ 20 ta Rasm Slayderi Kartasi (Tugma olib tashlandi, rasmlar kattalashtirildi) -->
+        <div class="lg:col-span-5 bg-white border border-stone-300/80 rounded-3xl p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+
+            <div class="flex items-center justify-between mb-4 z-10 relative">
+                <span class="bg-amber-100 text-amber-900 text-xs font-black px-3 py-1.5 rounded-full inline-flex items-center gap-1.5">
+                    🎨 Pinterest Gallery
+                </span>
+                <span class="text-xs font-bold text-stone-400">20 ta illyustratsiya</span>
+            </div>
+
+            <!-- Rasmlar aylanib turadigan asosiy ekran (Bo'sh joy to'ldirildi) -->
+            <div class="w-full h-80 sm:h-96 rounded-2xl relative overflow-hidden bg-stone-100 border border-stone-200 shadow-inner my-auto">
+                <!-- FastAPI uchun to'g'rilangan statik yo'llar -->
+                <img src="/static/img1.jpg" class="slider-img active" alt="Pin 1">
+                <img src="/static/img2.jpg" class="slider-img" alt="Pin 2">
+                <img src="/static/img3.jpg" class="slider-img" alt="Pin 3">
+                <img src="/static/img4.jpg" class="slider-img" alt="Pin 4">
+                <img src="/static/img5.jpg" class="slider-img" alt="Pin 5">
+                <img src="/static/img6.jpg" class="slider-img" alt="Pin 6">
+                <img src="/static/img7.jpg" class="slider-img" alt="Pin 7">
+                <img src="/static/img8.jpg" class="slider-img" alt="Pin 8">
+                <img src="/static/img9.jpg" class="slider-img" alt="Pin 9">
+                <img src="/static/img10.jpg" class="slider-img" alt="Pin 10">
+                <img src="/static/img11.jpg" class="slider-img" alt="Pin 11">
+                <img src="/static/img12.jpg" class="slider-img" alt="Pin 12">
+                <img src="/static/img13.jpg" class="slider-img" alt="Pin 13">
+                <img src="/static/img14.jpg" class="slider-img" alt="Pin 14">
+                <img src="/static/img15.jpg" class="slider-img" alt="Pin 15">
+                <img src="/static/img16.jpg" class="slider-img" alt="Pin 16">
+                <img src="/static/img17.jpg" class="slider-img" alt="Pin 17">
+                <img src="/static/img18.jpg" class="slider-img" alt="Pin 18">
+                <img src="/static/img19.jpg" class="slider-img" alt="Pin 19">
+                <img src="/static/img20.jpg" class="slider-img" alt="Pin 20">
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-6xl w-full mx-auto text-center text-xs text-stone-400 py-4 flex items-center justify-between border-t border-stone-200/60">
+        <div>CEFR AI Platformasi &copy; 2026</div>
+        <div class="flex gap-4">
+            <span class="hover:text-stone-700 cursor-pointer">Maxfiylik siyosati</span>
+            <span class="hover:text-stone-700 cursor-pointer">Yordam</span>
+        </div>
+    </footer>
+
+    <!-- Avtomatik Slayder uchun JavaScript -->
+    <script>
+        const slides = document.querySelectorAll('.slider-img');
+        let currentSlide = 0;
+
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        // Har 3 sekundda rasm navbatma-navbat almashib turadi
+        setInterval(nextSlide, 5000);
+    </script>
+</body>
+</html>

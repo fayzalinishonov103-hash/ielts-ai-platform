@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="space-y-8 max-w-5xl mx-auto">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-800 pb-6 gap-4">
+<div class="space-y-8 max-w-5xl mx-auto pb-12">
+    <!-- Yuqori qism va daraja o'zgartirish -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-stone-300/80 pb-6 gap-4">
         <div>
-            <h2 class="text-3xl font-black text-white">CEFR Listening Moduli</h2>
-            <p class="text-gray-400 mt-2">Audio matnlar va tushunish testlari.</p>
+            <h2 class="text-3xl font-black text-stone-900 tracking-tight">CEFR Listening Moduli</h2>
+            <p class="text-stone-600 mt-2 text-sm">Audio matnlar va tushunish testlari.</p>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 flex-wrap">
             <!-- Darajani o'zgartirish dropdown formasi -->
-            <form method="POST" action="/update-level" class="flex items-center gap-2 bg-slate-900/80 border border-gray-800 px-3 py-1.5 rounded-2xl shadow-lg">
-                <label class="text-xs font-semibold text-gray-400">Daraja:</label>
+            <form method="POST" action="/update-level" class="flex items-center gap-2 bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 px-3.5 py-2 rounded-2xl shadow-sm">
+                <label class="text-xs font-bold text-stone-500 uppercase">Daraja:</label>
                 <select name="level" onchange="this.form.submit()"
-                        class="bg-slate-950 border border-white/10 rounded-xl px-2.5 py-1 text-xs text-white font-bold focus:outline-none focus:border-emerald-500 transition cursor-pointer">
+                        class="bg-white border border-stone-300 rounded-xl px-3 py-1 text-xs text-stone-900 font-bold focus:outline-none focus:border-amber-700 transition cursor-pointer">
                     <option value="A1" {% if user_level == 'A1' %}selected{% endif %}>A1</option>
                     <option value="A2" {% if user_level == 'A2' %}selected{% endif %}>A2</option>
                     <option value="B1" {% if user_level == 'B1' %}selected{% endif %}>B1</option>
@@ -22,46 +23,47 @@
                 </select>
             </form>
 
-            <a href="/admin" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Admin Panel</a>
+            <a href="/admin" class="bg-stone-900 hover:bg-stone-800 text-white font-semibold px-4 py-2.5 rounded-2xl text-sm transition shadow-sm">Admin Panel</a>
         </div>
     </div>
 
+    <!-- Elementlar Grid ro'yxati -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {% if items %}
             {% for item in items %}
-            <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500/50 transition relative">
+            <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-amber-700/50 transition relative shadow-xl">
                 <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Listening {{ item.id }}</span>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold px-3 py-1 rounded-xl bg-amber-100 text-amber-800 border border-amber-200">Listening {{ item.id }}</span>
                         <!-- Har bir elementning o'z darajasi -->
-                        <span class="text-xs font-semibold text-gray-400 bg-gray-800/60 px-2.5 py-0.5 rounded-md uppercase">{{ item.level }}</span>
+                        <span class="text-xs font-bold text-stone-600 bg-stone-200/80 px-2.5 py-1 rounded-xl uppercase tracking-wider">{{ item.level }}</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mt-2 mb-2">{{ item.title }}</h3>
-                    <p class="text-sm text-gray-400 mb-4 line-clamp-2">{{ item.audio_text }}</p>
+                    <h3 class="text-xl font-black text-stone-900 mt-2 mb-2">{{ item.title }}</h3>
+                    <p class="text-sm text-stone-600 mb-6 line-clamp-2 leading-relaxed">{{ item.audio_text }}</p>
                 </div>
 
-                <div class="space-y-3 pt-4 border-t border-gray-800">
+                <div class="space-y-3 pt-4 border-t border-stone-300/60">
                     <!-- Detal sahifasiga o'tish tugmasi -->
-                    <a href="/listening/{{ item.id }}" class="block w-full text-center bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl transition text-sm shadow-lg shadow-emerald-500/10">
+                    <a href="/listening/{{ item.id }}" class="block w-full text-center bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 rounded-2xl transition text-sm shadow-md">
                         🎧 Testni boshlash va Ovozni boshqarish
                     </a>
 
                     <!-- AI Rejimi tugmasi -->
-                    <button onclick="loadAIHelper('listening', `{{ item.audio_text }}`, {{ item.id }})" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                    <button onclick="loadAIHelper('listening', `{{ item.audio_text }}`, {{ item.id }})" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-3 rounded-2xl transition text-sm shadow-sm">
                         🤖 AI Rejimi (Kalit so'zlar)
                     </button>
                 </div>
 
                 <!-- AI yordamchi natijasi chiqadigan joy -->
-                <div id="ai-helper-box-{{ item.id }}" class="hidden mt-4 p-4 bg-slate-950 border border-indigo-500/30 rounded-xl text-gray-300 space-y-2">
-                    <h4 class="text-indigo-400 font-bold text-xs">AI Tavsiyalari:</h4>
+                <div id="ai-helper-box-{{ item.id }}" class="hidden mt-4 p-4 bg-white border border-amber-700/30 rounded-2xl text-stone-700 space-y-2 shadow-sm">
+                    <h4 class="text-amber-800 font-bold text-xs uppercase tracking-wider">AI Tavsiyalari:</h4>
                     <div id="ai-helper-content-{{ item.id }}" class="whitespace-pre-line text-xs leading-relaxed"></div>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <div class="col-span-2 text-center text-gray-500 py-10">
-                Sizning <b>{{ user_level }}</b> darajangiz uchun hozircha listening matnlari yo'q. <a href="/admin" class="text-emerald-400 underline">Admin paneldan qo'shing</a>.
+            <div class="col-span-2 text-center text-stone-500 py-12 bg-[#FAF8F5]/50 border border-stone-300/60 rounded-3xl">
+                Sizning <b class="text-stone-900">{{ user_level }}</b> darajangiz uchun hozircha listening matnlari yo'q. <a href="/admin" class="text-amber-700 font-bold underline">Admin paneldan qo'shing</a>.
             </div>
         {% endif %}
     </div>

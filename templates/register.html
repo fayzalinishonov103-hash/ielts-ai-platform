@@ -1,82 +1,170 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="max-w-md mx-auto my-10 bg-slate-900/50 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl space-y-6">
-    <div class="text-center space-y-2">
-        <h1 class="text-2xl font-black text-white">Ro'yxatdan o'tish</h1>
-        <p class="text-xs text-gray-400">CEFR AI platformasida o'z profilingizni yarating</p>
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Ro'yxatdan o'tish - CEFR AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body style="background-color: #FAF8F5;" class="text-stone-900 min-h-screen py-12 px-4 flex items-center justify-center overflow-y-auto">
+    <div style="background-color: #FAF8F5;" class="p-8 rounded-3xl shadow-xl w-full max-w-md border border-stone-300/80 my-auto backdrop-blur-md">
+        <h2 class="text-2xl font-black mb-6 text-center text-stone-900 tracking-tight">Ro'yxatdan o'tish</h2>
+
+        <form action="/register" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-stone-600 uppercase mb-1">F.I.O (Ism familiya)</label>
+                <input type="text" name="name" required style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Username</label>
+                <input type="text" name="username" required style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Parol</label>
+                <input type="password" name="password" required style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Tug'ilgan sana</label>
+                <input type="date" name="birth_date" required style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Manzil</label>
+                <input type="text" name="address" required style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+            </div>
+
+            <!-- Ta'lim turi tanlash -->
+            <div>
+                <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Ta'lim holatingiz</label>
+                <select id="education_type" name="education_type" onchange="toggleEducationFields()" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700 transition cursor-pointer font-semibold">
+                    <option value="universitet">Universitet</option>
+                    <option value="kollej">Kollej</option>
+                    <option value="texnikum">Texnikum</option>
+                    <option value="maktab">Maktab</option>
+                    <option value="boshqa">Boshqa (Ishlayman va h.k.)</option>
+                </select>
+            </div>
+
+            <!-- Dinamik chiqadigan maydonlar uchun konteyner -->
+            <div id="dynamic_fields" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Universitet nomi</label>
+                    <input type="text" name="university" placeholder="Masalan: Andijan State Technical University" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Fakultet</label>
+                    <input type="text" name="faculty" placeholder="Fakultetingizni kiriting" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Kurs</label>
+                        <select name="course" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700 transition cursor-pointer font-semibold">
+                            <option value="1-kurs">1-kurs</option>
+                            <option value="2-kurs">2-kurs</option>
+                            <option value="3-kurs">3-kurs</option>
+                            <option value="4-kurs">4-kurs</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Yo'nalish</label>
+                        <input type="text" name="specialty" placeholder="Mutaxassislik/Yo'nalish" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daraja tanlash (Tugmalar ko'rinishida) -->
+            <div>
+                <label class="block text-xs font-bold text-stone-600 uppercase mb-2">Darajangiz (CEFR Level)</label>
+                <div class="grid grid-cols-6 gap-1.5" id="level_buttons">
+                    <button type="button" onclick="setLevel('A1', this)" class="level-btn bg-white border border-stone-300 rounded-xl py-2 text-xs font-bold text-stone-700 hover:border-amber-700 transition">A1</button>
+                    <button type="button" onclick="setLevel('A2', this)" class="level-btn bg-white border border-stone-300 rounded-xl py-2 text-xs font-bold text-stone-700 hover:border-amber-700 transition">A2</button>
+                    <button type="button" onclick="setLevel('B1', this)" class="level-btn bg-white border border-stone-300 rounded-xl py-2 text-xs font-bold text-stone-700 hover:border-amber-700 transition">B1</button>
+                    <button type="button" onclick="setLevel('B2', this)" class="level-btn bg-amber-700 border border-amber-700 rounded-xl py-2 text-xs font-bold text-white transition active shadow-sm">B2</button>
+                    <button type="button" onclick="setLevel('C1', this)" class="level-btn bg-white border border-stone-300 rounded-xl py-2 text-xs font-bold text-stone-700 hover:border-amber-700 transition">C1</button>
+                    <button type="button" onclick="setLevel('C2', this)" class="level-btn bg-white border border-stone-300 rounded-xl py-2 text-xs font-bold text-stone-700 hover:border-amber-700 transition">C2</button>
+                </div>
+                <input type="hidden" name="level" id="selected_level" value="B2">
+            </div>
+
+            <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-3.5 rounded-2xl transition duration-200 shadow-md cursor-pointer mt-2">Ro'yxatdan o'tish</button>
+        </form>
+
+        <p class="text-center text-xs text-stone-600 mt-4">
+            Hisobingiz bormi? <a href="/login" class="text-amber-700 font-bold hover:underline">Kirish</a>
+        </p>
     </div>
 
-    <form action="/register" method="POST" class="space-y-4" autocomplete="off">
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">To'liq ism-familiya</label>
-            <input type="text" name="name" placeholder="Falonchi Falonchiyev" required
-                   class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
-        </div>
+    <script>
+        function toggleEducationFields() {
+            const type = document.getElementById("education_type").value;
+            const container = document.getElementById("dynamic_fields");
 
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Foydalanuvchi nomi (Username)</label>
-            <input type="text" name="username" autocomplete="off" placeholder="username" required
-                   class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block text-xs font-semibold text-gray-300 mb-1">Tug'ilgan sana</label>
-                <input type="text" name="birth_date" placeholder="KK.OO.YYYY" required
-                       class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-300 mb-1">Yashash manzili</label>
-                <input type="text" name="address" placeholder="Shahar / Tuman" required
-                       class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
-            </div>
-        </div>
-
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Universitet / O'quv yurti <span class="text-gray-500 font-normal">(ixtiyoriy)</span></label>
-            <input type="text" name="university" placeholder="Andijan State Technical University"
-                   class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
-        </div>
-
-        <!-- CEFR Darajasini tanlash -->
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">O'zingizning CEFR darajangiz</label>
-            <select name="level" required
-                    class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
-                <option value="A2" class="bg-slate-900 text-white">A2 - Elementary</option>
-                <option value="B1" class="bg-slate-900 text-white">B1 - Intermediate</option>
-                <option value="B2" selected class="bg-slate-900 text-white">B2 - Upper-Intermediate (Standart)</option>
-                <option value="C1" class="bg-slate-900 text-white">C1 - Advanced</option>
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Parol</label>
-            <input type="password" name="password" placeholder="••••••••" autocomplete="new-password" required
-                   class="w-full bg-slate-950/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
-        </div>
-
-        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
-            Ro'yxatdan o'tish
-        </button>
-    </form>
-
-    <p class="text-center text-xs text-gray-400">
-        Hisobingiz bormi? <a href="/login" class="text-emerald-400 font-semibold hover:underline">Kirish</a>
-    </p>
-</div>
-<script>
-    const birthInput = document.querySelector('input[name="birth_date"]');
-    if (birthInput) {
-        birthInput.addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 2 && value.length <= 4) {
-                value = value.slice(0, 2) + '.' + value.slice(2);
-            } else if (value.length > 4) {
-                value = value.slice(0, 2) + '.' + value.slice(2, 4) + '.' + value.slice(4, 8);
+            if (type === "universitet") {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Universitet nomi</label>
+                        <input type="text" name="university" placeholder="Masalan: Andijan State Technical University" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Fakultet</label>
+                        <input type="text" name="faculty" placeholder="Fakultetingizni kiriting" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Kurs</label>
+                            <select name="course" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700 transition cursor-pointer font-semibold">
+                                <option value="1-kurs">1-kurs</option>
+                                <option value="2-kurs">2-kurs</option>
+                                <option value="3-kurs">3-kurs</option>
+                                <option value="4-kurs">4-kurs</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Yo'nalish</label>
+                            <input type="text" name="specialty" placeholder="Mutaxassislik/Yo'nalish" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                        </div>
+                    </div>
+                `;
+            } else if (type === "kollej" || type === "texnikum") {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Ta'lim muassasasi nomi</label>
+                        <input type="text" name="university" placeholder="Kollej yoki texnikum nomi" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Mutaxassislik / Kasb</label>
+                        <input type="text" name="specialty" placeholder="Kasb nomi" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                `;
+            } else if (type === "maktab") {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Maktab raqami / nomi</label>
+                        <input type="text" name="university" placeholder="Masalan: 15-sonli maktab" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Sinf</label>
+                        <input type="text" name="faculty" placeholder="Masalan: 11-sinf" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1">Faoliyat turi / Izoh</label>
+                        <input type="text" name="university" placeholder="Masalan: Hozirda ishlayapman / Abituriyent" style="background-color: #FFFFFF; color: #1c1917;" class="w-full border border-stone-300 rounded-2xl px-4 py-3 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-700 transition">
+                    </div>
+                `;
             }
-            e.target.value = value;
-        });
-    }
-</script>
-{% endblock %}
+        }
+
+        function setLevel(level, btn) {
+            document.querySelectorAll('.level-btn').forEach(b => {
+                b.classList.remove('bg-amber-700', 'border-amber-700', 'text-white', 'shadow-sm');
+                b.classList.add('bg-white', 'border-stone-300', 'text-stone-700');
+            });
+            btn.classList.remove('bg-white', 'border-stone-300', 'text-stone-700');
+            btn.classList.add('bg-amber-700', 'border-amber-700', 'text-white', 'shadow-sm');
+            document.getElementById('selected_level').value = level;
+        }
+    </script>
+</body>
+</html>

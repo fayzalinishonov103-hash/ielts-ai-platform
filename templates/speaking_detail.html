@@ -1,56 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="max-w-4xl mx-auto space-y-6 pb-12">
     <!-- Orqaga qaytish -->
-    <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-        <a href="/speaking" class="text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition">&larr; Speaking mavzulariga qaytish</a>
-        <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Speaking Task #{{ topic.id }}</span>
+    <div class="flex justify-between items-center border-b border-stone-300/80 pb-4">
+        <a href="/speaking" class="text-amber-700 hover:text-amber-800 text-sm font-semibold transition">&larr; Speaking mavzulariga qaytish</a>
+        <span class="text-xs font-bold px-3 py-1 rounded-xl bg-amber-100 text-amber-800 border border-amber-200">Speaking Task #{{ topic.id }}</span>
     </div>
 
     <!-- Mavzu bloki -->
-    <div class="bg-gray-900/80 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-3">
-        <h1 class="text-2xl font-black text-white">{{ topic.title }}</h1>
-        <p class="text-sm text-gray-400">Ushbu mavzu bo'yicha o'z fikringizni bayon qiling. Mikrofonni yoqib gapirishingiz yoki matnni o'zingiz kiritishingiz mumkin.</p>
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 md:p-8 rounded-3xl shadow-xl space-y-3">
+        <h1 class="text-2xl font-black text-stone-900">{{ topic.title }}</h1>
+        <p class="text-sm text-stone-600">Ushbu mavzu bo'yicha o'z fikringizni bayon qiling. Mikrofonni yoqib gapirishingiz yoki matnni o'zingiz kiritishingiz mumkin.</p>
 
         <!-- AI Yordamchi tugmasi -->
         <div class="pt-2">
-            <button onclick="getAiHelp()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center space-x-2">
+            <button onclick="getAiHelp()" class="bg-amber-100/80 hover:bg-amber-200 text-amber-800 border border-amber-300 font-bold px-5 py-3 rounded-2xl text-sm transition flex items-center space-x-2 shadow-sm">
                 <span>💡 AI Yordamchi (G'oya va Kalit so'zlar)</span>
             </button>
         </div>
     </div>
 
     <!-- AI Yordamchi Natijasi -->
-    <div id="ai-help-box" class="hidden bg-gray-900/90 border border-blue-500/30 p-6 rounded-2xl shadow-xl space-y-3">
-        <h3 class="text-lg font-bold text-blue-400">🤖 AI Ekspert Maslahatlari:</h3>
-        <div id="ai-help-content" class="text-gray-300 text-sm whitespace-pre-line leading-relaxed bg-slate-950 p-4 rounded-xl border border-gray-800"></div>
+    <div id="ai-help-box" class="hidden bg-white border border-amber-700/30 p-6 rounded-3xl shadow-xl space-y-3">
+        <h3 class="text-lg font-black text-amber-800">🤖 AI Ekspert Maslahatlari:</h3>
+        <div id="ai-help-content" class="text-stone-700 text-sm whitespace-pre-line leading-relaxed bg-[#FAF8F5] p-5 rounded-2xl border border-stone-300/80"></div>
     </div>
 
     <!-- Nutq matnini kiritish va Mikrofon -->
-    <div class="bg-gray-900/80 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-4">
-        <div class="flex justify-between items-center">
-            <label class="block text-sm font-bold text-gray-200">Aytgan nutqingiz matni (Transkript):</label>
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 md:p-8 rounded-3xl shadow-xl space-y-4">
+        <div class="flex justify-between items-center flex-wrap gap-2">
+            <label class="block text-sm font-bold text-stone-900">Aytgan nutqingiz matni (Transkript):</label>
 
             <!-- Mikrofon tugmasi -->
-            <button id="mic-btn" onclick="toggleSpeechRecognition()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2">
+            <button id="mic-btn" onclick="toggleSpeechRecognition()" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 font-bold px-4 py-2.5 rounded-2xl text-xs transition flex items-center space-x-2 shadow-sm">
                 <span id="mic-icon">🎤</span>
                 <span id="mic-text">Mikrofonni yoqish</span>
             </button>
         </div>
 
-        <textarea id="transcript-text" rows="6" placeholder="Type or use microphone to speak..." class="w-full bg-slate-950 border border-gray-800 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-emerald-500 transition leading-relaxed"></textarea>
+        <textarea id="transcript-text" rows="6" placeholder="Type or use microphone to speak..." class="w-full bg-white border border-stone-300 rounded-2xl p-4 text-stone-900 text-sm focus:outline-none focus:border-amber-700 transition leading-relaxed shadow-sm"></textarea>
 
         <div class="flex justify-end pt-2">
-            <button onclick="checkSpeaking()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+            <button onclick="checkSpeaking()" class="bg-stone-900 hover:bg-stone-800 text-white font-bold px-6 py-3 rounded-2xl text-sm transition shadow-md">
                 Nutqni tahlil qilish
             </button>
         </div>
     </div>
 
     <!-- AI Tahlil / Natija qismi -->
-    <div id="feedback-box" class="hidden bg-gray-900/90 border border-emerald-500/30 p-6 rounded-2xl shadow-2xl space-y-4">
-        <h3 class="text-lg font-black text-emerald-400">🤖 AI Speaking Tahlili va Bahosi:</h3>
-        <div id="feedback-content" class="text-gray-300 text-sm whitespace-pre-line leading-relaxed bg-slate-950 p-5 rounded-xl border border-gray-800"></div>
+    <div id="feedback-box" class="hidden bg-white border border-emerald-500/30 p-6 md:p-8 rounded-3xl shadow-2xl space-y-4">
+        <h3 class="text-lg font-black text-emerald-800">🤖 AI Speaking Tahlili va Bahosi:</h3>
+        <div id="feedback-content" class="text-stone-700 text-sm whitespace-pre-line leading-relaxed bg-[#FAF8F5] p-5 rounded-2xl border border-stone-300/80"></div>
     </div>
 </div>
 
@@ -94,7 +94,7 @@ function toggleSpeechRecognition() {
     } else {
         recognition.start();
         isRecording = true;
-        document.getElementById('mic-btn').className = "bg-red-500 text-white border border-red-600 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2 animate-pulse";
+        document.getElementById('mic-btn').className = "bg-rose-700 text-white border border-rose-800 font-bold px-4 py-2.5 rounded-2xl text-xs transition flex items-center space-x-2 animate-pulse shadow-md";
         document.getElementById('mic-text').innerText = "Tinglanmoqda...";
     }
 }
@@ -106,7 +106,7 @@ function stopRecording() {
     }
     const micBtn = document.getElementById('mic-btn');
     if(micBtn) {
-        micBtn.className = "bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2";
+        micBtn.className = "bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 font-bold px-4 py-2.5 rounded-2xl text-xs transition flex items-center space-x-2 shadow-sm";
         document.getElementById('mic-text').innerText = "Mikrofonni yoqish";
     }
 }

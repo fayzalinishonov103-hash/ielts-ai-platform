@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="max-w-4xl mx-auto space-y-6 pb-12">
     <!-- Profil Sarlavhasi / Asosiy Ma'lumot -->
-    <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-8 rounded-2xl shadow-xl flex flex-col md:flex-row items-center gap-6">
-        <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-emerald-500 to-blue-600 flex items-center justify-center text-slate-950 font-black text-3xl shadow-lg shadow-emerald-500/20">
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 md:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row items-center gap-6">
+        <div class="w-24 h-24 rounded-2xl bg-amber-700 flex items-center justify-center text-white font-black text-3xl shadow-md">
             {% if user.name %}
                 {{ user.name[:2].upper() }}
             {% else %}
@@ -12,46 +12,46 @@
         </div>
 
         <div class="text-center md:text-left space-y-2 flex-grow">
-            <h1 class="text-2xl font-black text-white">{{ user.name }}</h1>
-            <p class="text-sm text-gray-400">{{ user.university }} • {{ user.specialty if user.specialty else "Mutaxassislik kiritilmagan" }}</p>
+            <h1 class="text-2xl font-black text-stone-900 tracking-tight">{{ user.name }}</h1>
+            <p class="text-sm text-stone-600">{{ user.university }} • {{ user.specialty if user.specialty else "Mutaxassislik kiritilmagan" }}</p>
             <div class="flex flex-wrap justify-center md:justify-start gap-2 pt-1">
-                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Daraja: {{ user.level }}</span>
-                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Username: @{{ user.username }}</span>
+                <span class="text-xs font-bold px-3 py-1 rounded-xl bg-amber-100 text-amber-800 border border-amber-200">Daraja: {{ user.level }}</span>
+                <span class="text-xs font-bold px-3 py-1 rounded-xl bg-stone-200/80 text-stone-700 border border-stone-300">Username: @{{ user.username }}</span>
             </div>
         </div>
         <div>
-            <a href="/logout" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl transition text-sm font-semibold">Chiqish</a>
+            <a href="/logout" class="bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-200 px-4 py-2.5 rounded-2xl transition text-sm font-bold shadow-sm">Chiqish</a>
         </div>
     </div>
 
     <!-- Statistika Bloklari -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
-            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Jami Materiallar</p>
-            <h3 class="text-3xl font-black text-white">{{ user.total_tasks if user.total_tasks else 0 }}</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 rounded-3xl shadow-xl text-center space-y-1">
+            <p class="text-xs text-stone-400 font-bold uppercase tracking-wider">Jami Materiallar</p>
+            <h3 class="text-3xl font-black text-stone-900">{{ user.total_tasks if user.total_tasks else 0 }}</h3>
         </div>
-        <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
-            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Reading</p>
-            <h3 class="text-3xl font-black text-emerald-400">{{ user.reading_count if user.reading_count else 0 }}</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 rounded-3xl shadow-xl text-center space-y-1">
+            <p class="text-xs text-stone-400 font-bold uppercase tracking-wider">Reading</p>
+            <h3 class="text-3xl font-black text-amber-700">{{ user.reading_count if user.reading_count else 0 }}</h3>
         </div>
-        <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
-            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Listening</p>
-            <h3 class="text-3xl font-black text-blue-400">{{ user.listening_count if user.listening_count else 0 }}</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 rounded-3xl shadow-xl text-center space-y-1">
+            <p class="text-xs text-stone-400 font-bold uppercase tracking-wider">Listening</p>
+            <h3 class="text-3xl font-black text-amber-800">{{ user.listening_count if user.listening_count else 0 }}</h3>
         </div>
-        <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl text-center space-y-1">
-            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Writing</p>
-            <h3 class="text-3xl font-black text-purple-400">{{ user.writing_count if user.writing_count else 0 }}</h3>
+        <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 rounded-3xl shadow-xl text-center space-y-1">
+            <p class="text-xs text-stone-400 font-bold uppercase tracking-wider">Writing</p>
+            <h3 class="text-3xl font-black text-stone-900">{{ user.writing_count if user.writing_count else 0 }}</h3>
         </div>
     </div>
 
     <!-- Shaxsiy Ma'lumotlar -->
-    <div class="bg-slate-900/50 backdrop-blur border border-gray-800 p-6 rounded-2xl shadow-xl space-y-4">
-        <h3 class="text-lg font-bold text-white border-b border-gray-800 pb-3">Shaxsiy ma'lumotlar</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-            <div><span class="text-gray-500">Tug'ilgan sana:</span> {{ user.birth_date }}</div>
-            <div><span class="text-gray-500">Manzil:</span> {{ user.address }}</div>
-            <div><span class="text-gray-500">Fakultet:</span> {{ user.faculty if user.faculty else "Ko'rsatilmagan" }}</div>
-            <div><span class="text-gray-500">Mutaxassislik:</span> {{ user.specialty if user.specialty else "Ko'rsatilmagan" }}</div>
+    <div class="bg-[#FAF8F5]/80 backdrop-blur-md border border-stone-300/80 p-6 md:p-8 rounded-3xl shadow-xl space-y-4">
+        <h3 class="text-lg font-black text-stone-900 border-b border-stone-300/60 pb-3">Shaxsiy ma'lumotlar</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-stone-700">
+            <div><span class="text-stone-400 font-semibold">Tug'ilgan sana:</span> {{ user.birth_date }}</div>
+            <div><span class="text-stone-400 font-semibold">Manzil:</span> {{ user.address }}</div>
+            <div><span class="text-stone-400 font-semibold">Fakultet:</span> {{ user.faculty if user.faculty else "Ko'rsatilmagan" }}</div>
+            <div><span class="text-stone-400 font-semibold">Mutaxassislik:</span> {{ user.specialty if user.specialty else "Ko'rsatilmagan" }}</div>
         </div>
     </div>
 </div>

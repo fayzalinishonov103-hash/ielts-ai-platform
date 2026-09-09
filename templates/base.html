@@ -3,41 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEFR AI Platformasi</title>
-    <!-- Tailwind CSS CDN -->
+    <title>{% block title %}CEFR & IELTS Platformasi{% endblock %}</title>
+
+    <!-- Montserrat Shrifti -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Asosiy Stillar va Montserrat'ni majburiy qilish -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FAF8F5;
+            color: #1c1917;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAF8F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-slate-950 text-gray-100 min-h-screen flex flex-col justify-between font-sans selection:bg-emerald-500 selection:text-slate-950">
+<body class="min-h-screen flex flex-col selection:bg-amber-700 selection:text-white">
 
-    <!-- Navbar / Yuqori menyu -->
-    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between flex-wrap">
-            <!-- Logo -->
-            <a href="/" class="text-lg md:text-xl font-black tracking-wider text-emerald-400 flex items-center space-x-2">
-                <span>🚀 CEFR AI</span>
+    <!-- Navbar / Header (Agar sahifada umumiy header kerak bo'lsa) -->
+    <header class="w-full border-b border-stone-200 bg-[#FAF8F5]/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="text-xl font-black tracking-tight text-stone-900 flex items-center gap-2">
+                <span class="w-3 h-3 bg-amber-700 rounded-full"></span>
+                CEFR Platform FR∞
             </a>
-
-            <!-- Menyu havolalari -->
-            <nav class="flex items-center space-x-3 md:space-x-6 text-xs md:text-sm font-semibold overflow-x-auto py-2">
-                <a href="/reading" class="hover:text-emerald-400 transition whitespace-nowrap">Reading</a>
-                <a href="/listening" class="hover:text-emerald-400 transition whitespace-nowrap">Listening</a>
-                <a href="/writing" class="hover:text-emerald-400 transition whitespace-nowrap">Writing</a>
-                <a href="/speaking" class="hover:text-emerald-400 transition whitespace-nowrap">Speaking</a>
-                <a href="/profile" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 md:px-4 md:py-2 rounded-xl hover:bg-emerald-500/20 transition whitespace-nowrap">Profil</a>
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-stone-600">
+                <a href="/reading" class="hover:text-stone-900 transition">Reading</a>
+                <a href="/listening" class="hover:text-stone-900 transition">Listening</a>
+                <a href="/writing" class="hover:text-stone-900 transition">Writing</a>
+                <a href="/speaking" class="hover:text-stone-900 transition">Speaking</a>
             </nav>
+            <div class="flex items-center gap-4">
+                <a href="/profile" class="text-sm font-bold px-4 py-2 bg-stone-900 text-white rounded-2xl hover:bg-stone-800 transition shadow-sm">
+                    Kabinet
+                </a>
+            </div>
         </div>
     </header>
 
-    <!-- Asosiy kontent qismi -->
-    <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8 flex-grow w-full">
+    <!-- Asosiy Kontent Maydoni -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-6">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Pastki qism (Footer) -->
-    <footer class="border-t border-gray-800 bg-gray-900/30 text-center py-6 text-xs text-gray-500">
-        <p>&copy; 2026 CEFR AI Platformasi. Barcha huquqlar himoyalangan.</p>
+    <!-- Footer -->
+    <footer class="w-full border-t border-stone-200 py-6 text-center text-xs font-medium text-stone-500 bg-[#FAF8F5]">
+        <p>&copy; 2026 CEFR & IELTS AI Platformasi. Barcha huquqlar himoyalangan.</p>
     </footer>
 
 </body>
